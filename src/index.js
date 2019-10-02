@@ -27,4 +27,6 @@ app.get('/app/*', (_req, res) => {
 });
 
 app.use('/api', api);
-peerStartup(app);
+app.server = peerStartup(app);
+
+module.exports = app;

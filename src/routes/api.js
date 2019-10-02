@@ -4,6 +4,10 @@ const log = require('debug')('api');
 // eslint-disable-next-line new-cap
 const router = express.Router();
 
+router.get('/', (req, res) => {
+  res.send('Hello world!');
+});
+
 router.post('/session', (req, res) => {
   if (req.session.login) {
     res.send({});
@@ -22,7 +26,6 @@ router.post('/login', (req, res) => {
     log(`User ${req.session.login} logged in`, req.sessionID);
     return res.send();
   }
-
   res.status(403).send();
 });
 
@@ -37,6 +40,14 @@ router.post('/logout', (req, res, next) => {
     log(`User ${name} logged out`, id);
     res.send();
   });
+});
+
+router.post('/register', (req, res) => {
+  if (req.body.login === undefined || req.body.password === undefined) {
+    return res.status(400).send();
+  }
+
+  // TODO: add user to database  
 });
 
 module.exports = router;

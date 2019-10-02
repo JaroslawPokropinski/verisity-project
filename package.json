@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "set DEBUG=* & nodemon src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha tests/*.js --timeout 5000 --exit"
   },
   "repository": {
     "type": "git",
@@ -21,7 +21,6 @@
   "homepage": "https://github.com/JaroslawPokropinski/versity-project#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
-    "connect-mongodb-session": "^2.2.0",
     "connect-session-sequelize": "^6.0.0",
     "cors": "^2.8.5",
     "debug": "^4.1.1",
@@ -31,8 +30,12 @@
     "sequelize": "^5.19.2"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
     "eslint": "^6.5.1",
+    "mocha": "^6.2.1",
     "nodemon": "^1.19.3",
+    "connect-mongodb-session": "^2.2.0",
     "prettier": "^1.18.2"
   }
 }
