@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/JaroslawPokropinski/versity-project.svg?branch=master)](https://travis-ci.org/JaroslawPokropinski/versity-project)
 # versity-project
 
 Versity-project is an project written for 'Software Development Methods' on Wrocław University of Science.
