@@ -14,16 +14,20 @@ const getStore = (session) => {
     }
 
     else {
-        const DBStore = require('connect-mongodb-session')(session);
-        const store = new DBStore({
-            uri: 'mongodb://localhost:27017/connect_mongodb_session_test',
-            collection: 'mySessions',
-        });
+        // const DBStore = require('connect-mongodb-session')(session);
+        // const store = new DBStore({
+        //     uri: 'mongodb://localhost:27017/connect_mongodb_session_test',
+        //     collection: 'mySessions',
+        // });
+        // return {
+        //     resave: true,
+        //     saveUninitialized: true,
+        //     store,
+        // };
         return {
             resave: true,
             saveUninitialized: true,
-            store,
-        };
+        }
     }
 }
 
