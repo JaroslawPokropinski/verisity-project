@@ -1,0 +1,38 @@
+{
+  "name": "versity-project",
+  "version": "1.0.0",
+  "description": "Versity-project is an project written for 'Software Development Methods' on Wrocław University of Science.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "set DEBUG=* & nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JaroslawPokropinski/versity-project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JaroslawPokropinski/versity-project/issues"
+  },
+  "homepage": "https://github.com/JaroslawPokropinski/versity-project#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "connect-mongodb-session": "^2.2.0",
+    "connect-session-sequelize": "^6.0.0",
+    "cors": "^2.8.5",
+    "debug": "^4.1.1",
+    "express": "^4.17.1",
+    "express-session": "^1.16.2",
+    "peer": "git+https://github.com/peers/peerjs-server.git",
+    "sequelize": "^5.19.2"
+  },
+  "devDependencies": {
+    "eslint": "^6.5.1",
+    "nodemon": "^1.19.3",
+    "prettier": "^1.18.2"
+  }
+}
