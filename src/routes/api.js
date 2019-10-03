@@ -4,6 +4,18 @@ const log = require('debug')('api');
 // eslint-disable-next-line new-cap
 const router = express.Router();
 
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Hello world!
+ *     description: Welcome the world!
+ *     responses:
+ *       200:
+ *         description: Welcome world string
+ *         schema:
+ *           type: string
+ */
 router.get('/', (req, res) => {
   res.send('Hello world!');
 });
