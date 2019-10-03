@@ -32,10 +32,11 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
+    "connect-mongodb-session": "^2.2.0",
     "eslint": "^6.5.1",
     "mocha": "^6.2.1",
     "nodemon": "^1.19.3",
-    "connect-mongodb-session": "^2.2.0",
-    "prettier": "^1.18.2"
+    "prettier": "^1.18.2",
+    "swagger-jsdoc": "^3.4.0"
   }
 }

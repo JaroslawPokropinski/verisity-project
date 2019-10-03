@@ -1,5 +1,5 @@
 const getStore = (session) => {
-    if (process.env.PROD) {
+    if (process.env.NODE_ENV === 'production') {
         const Sequelize = require('sequelize');
         const db = new Sequelize(
             `${process.env.DATABASE_URL}?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory`

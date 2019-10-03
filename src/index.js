@@ -27,6 +27,19 @@ app.get('/app/*', (_req, res) => {
 });
 
 app.use('/api', api);
+
+if (process.env.NODE_ENV !== 'production') {
+  const swaggerSpec = require('./docs/swaggerConfig');
+
+  app.get('/swagger.json', (_req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(swaggerSpec);
+  });
+
+  app.get('/docs', (_req, res) => {
+    res.sendFile(path.join(__dirname, 'docs/redoc.html'));
+  });
+}
 app.server = peerStartup(app);
 
 module.exports = app;
