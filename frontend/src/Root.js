@@ -29,7 +29,7 @@ class Root extends React.Component {
     peer.on('call', (call) => {
       // Answer the call, providing our mediaStream
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+        navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then((stream) => {
           call.answer(stream);
           call.on('stream', (incoming) => {
             // provide stream to video element
