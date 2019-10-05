@@ -3,6 +3,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const cors = require('cors');
+const log = require('debug')('app');
 
 const api = require('./routes/api');
 const getDbConfig = require('./dbConfig');
@@ -42,5 +43,12 @@ if (process.env.NODE_ENV !== 'production') {
   });
 }
 app.server = peerStartup(app);
+app.server.on('connection', (client) => {
+  log(`${client.id} connected!`);
+});
+
+app.server.on('disconnect', (client) => {
+  log(`${client.id} disconnected!`);
+});
 
 module.exports = app;
