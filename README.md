@@ -10,6 +10,7 @@ Versity-project is an project written for 'Software Development Methods' on Wroc
 - [ ] Users can call their friends on group video chat
 - [ ] Users can text message their friends
 - [ ] Users can text message their friends on group chat
+- [ ] ...
 
 ## Authors
 + Jarosław Pokropiński
