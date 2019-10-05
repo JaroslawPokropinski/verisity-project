@@ -20,12 +20,19 @@ router.get('/', (req, res) => {
   res.send('Hello world!');
 });
 
-router.post('/session', (req, res) => {
+const UserInfo = (login) => {
+  this.login = login;
+};
+
+router.post('/session/create', (req, res) => {
+  res.send(req.session.sessionID);
+});
+
+router.post('/session/userinfo', (req, res) => {
   if (req.session.login) {
-    res.send({});
-  } else {
-    res.status(403).send();
+    return res.send(new UserInfo(req.session.login));
   }
+  res.send();
 });
 
 router.post('/login', (req, res) => {

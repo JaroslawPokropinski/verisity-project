@@ -7,9 +7,10 @@ const cors = require('cors');
 const api = require('./routes/api');
 const getDbConfig = require('./dbConfig');
 const peerStartup = require('./peerStartup');
+const corsConfig = require('./corsConfig');
 
 const app = express();
-app.use(cors());
+app.use(cors(corsConfig));
 app.use(bodyParser.json());
 app.use(session({
   ...getDbConfig(session),
