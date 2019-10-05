@@ -13,10 +13,15 @@ const corsConfig = require('./corsConfig');
 const app = express();
 app.use(cors(corsConfig));
 app.use(bodyParser.json());
+const dbConfig = getDbConfig(session);
 app.use(session({
-  ...getDbConfig(session),
+  ...dbConfig,
   secret: process.env.COOKIE_SECRET || 'shhhh! its a secret1',
 }));
+
+if (process.env.NODE_ENV === 'production') {
+  dbConfig.store.sync();
+}
 
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
 
