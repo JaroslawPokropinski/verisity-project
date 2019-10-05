@@ -52,7 +52,7 @@ class Root extends React.Component {
     const { store } = this.props;
     const { peer } = store;
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+      navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then((stream) => {
         const call = peer.call(id, stream);
         call.on('stream', (incoming) => {
           // provide stream to video element

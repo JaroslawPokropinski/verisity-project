@@ -33,6 +33,7 @@ class App extends React.Component {
     // Connect peer
     const peer = new Peer();
     peer.on('open', (id) => {
+      console.log(id);
       this.setState((prevState) => ({
         ...prevState, peer, isPeerOpen: true, peerId: id
       }));

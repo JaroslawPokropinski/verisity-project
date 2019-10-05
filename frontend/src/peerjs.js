@@ -4,7 +4,7 @@ class MyPeer extends Peer {
   constructor() {
     if (process.env.NODE_ENV === 'production') {
       super({
-        host: 'file-peer.herokuapp.com',
+        host: 'versity-project.herokuapp.com',
         path: '/myapp',
         port: 443,
         secure: true,
