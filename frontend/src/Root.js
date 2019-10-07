@@ -27,9 +27,12 @@ class Root extends React.Component {
 
     const { peer } = store;
     peer.on('call', (call) => {
+      call.on('error', (err) => {
+        console.error(`Call error: ${err}`);
+      });
       // Answer the call, providing our mediaStream
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then((stream) => {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
           call.answer(stream);
           call.on('stream', (incoming) => {
             // provide stream to video element
@@ -38,6 +41,8 @@ class Root extends React.Component {
               this.videoRef.current.play();
             }
           });
+        }).catch((error) => {
+          console.error(`Failed to get video with error: ${error}`);
         });
       } else {
         // Inform user about error (no camera)
@@ -52,7 +57,7 @@ class Root extends React.Component {
     const { store } = this.props;
     const { peer } = store;
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then((stream) => {
+      navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
         const call = peer.call(id, stream);
         call.on('stream', (incoming) => {
           // provide stream to video element
@@ -82,8 +87,12 @@ class Root extends React.Component {
 
   render() {
     const { input } = this.state;
+    const { store } = this.props;
+    const { peerId } = store;
+
     return (
       <RootContainer>
+        {peerId}
         <input type="text" onChange={this.onInput} value={input} />
         <input type="submit" value="Connect" onClick={this.onClick} />
         <Chat onVideo={this.onVideo} />

@@ -23,14 +23,14 @@ if (process.env.NODE_ENV === 'production') {
   dbConfig.store.sync();
 }
 
-app.use(express.static(path.join(__dirname, 'frontend/dist')));
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
 app.get('/', (_req, res) => {
   res.redirect('/app');
 });
 
 app.get('/app/*', (_req, res) => {
-  res.sendFile(path.join(__dirname + '/react/dist/index.html'));
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
 app.use('/api', api);
