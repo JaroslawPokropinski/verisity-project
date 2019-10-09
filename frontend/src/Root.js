@@ -10,40 +10,69 @@ const RootContainer = styled.div`
 
 `;
 
+const getDevices = () => new Promise((resolve) => {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+    return resolve({ audio: false, video: false });
+  }
+
+  navigator.mediaDevices.enumerateDevices().then((devices) => {
+    const reducer = (accumulator, device) => {
+      if (device.kind === 'audioinput') {
+        accumulator.audio = true;
+      }
+
+      if (device.kind === 'videoinput') {
+        accumulator.video = true;
+      }
+      return accumulator;
+    };
+    resolve(devices.reduce(reducer, { audio: false, video: false }));
+  });
+  return null;
+});
+
 class Root extends React.Component {
   constructor() {
     super();
     this.state = { /* friends: null */ input: '' };
     this.mediastream = null;
     this.videoRef = null;
+    this.devices = { audio: false, video: false };
     autoBind(this);
   }
 
   componentDidMount() {
     const { store, history } = this.props;
-    // if (!store.isSessionOnline) {
-    //   history.push('/login');
-    // }
+    // TODO: if (!store.isSessionOnline) {
+    if (false) {
+      history.push('/login');
+    }
+    getDevices().then((devices) => { this.devices = devices; });
 
     const { peer } = store;
     peer.on('call', (call) => {
       call.on('error', (err) => {
-        console.error(`Call error: ${err}`);
+        alert(`Call error: ${err}`);
       });
       // Answer the call, providing our mediaStream
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-          call.answer(stream);
-          call.on('stream', (incoming) => {
-            // provide stream to video element
-            if (this.videoRef.current !== null) {
-              this.videoRef.current.srcObject = incoming;
-              this.videoRef.current.play();
-            }
+      if (navigator.mediaDevices
+        && navigator.mediaDevices.getUserMedia
+        && navigator.mediaDevices.enumerateDevices) {
+        navigator.mediaDevices
+          .getUserMedia({ audio: this.devices.audio, video: this.devices.video })
+          .then((stream) => {
+            call.answer(stream);
+            call.on('stream', (incoming) => {
+              // provide stream to video element
+              if (this.videoRef.current !== null) {
+                this.videoRef.current.srcObject = incoming;
+                this.videoRef.current.play();
+              }
+            });
+          })
+          .catch((error) => {
+            alert(`Failed to get video with error: ${error}`);
           });
-        }).catch((error) => {
-          console.error(`Failed to get video with error: ${error}`);
-        });
       } else {
         // Inform user about error (no camera)
         call.close();
@@ -56,17 +85,23 @@ class Root extends React.Component {
     // call server for 'to' id
     const { store } = this.props;
     const { peer } = store;
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-        const call = peer.call(id, stream);
-        call.on('stream', (incoming) => {
-          // provide stream to video element
-          if (this.videoRef.current !== null) {
-            this.videoRef.current.srcObject = incoming;
-            this.videoRef.current.play();
-          }
+    if (navigator.mediaDevices
+      && navigator.mediaDevices.getUserMedia
+      && navigator.mediaDevices.enumerateDevices) {
+      navigator.mediaDevices.getUserMedia({ audio: this.devices.audio, video: this.devices.video })
+        .then((stream) => {
+          const call = peer.call(id, stream);
+          call.on('stream', (incoming) => {
+            // provide stream to video element
+            if (this.videoRef.current !== null) {
+              this.videoRef.current.srcObject = incoming;
+              this.videoRef.current.play();
+            }
+          });
+        })
+        .catch((error) => {
+          alert(`Failed to get video with error: ${error}`);
         });
-      });
     } else {
       // Inform user about error (no camera)
     }

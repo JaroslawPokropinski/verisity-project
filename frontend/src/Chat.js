@@ -21,8 +21,7 @@ class Chat extends React.Component {
     return (
       <ChatContainer>
         {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-        <video width="640" height="480" ref={this.videoRef} controls />
-
+        <video ref={this.videoRef} />
       </ChatContainer>
     );
   }
