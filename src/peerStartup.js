@@ -42,7 +42,7 @@ const peerStartup = (app) => {
   const peerjs = ExpressPeerServer(server, options);
   app.use(peerjs);
   server.listen(options.port);
-  return server;
+  return peerjs;
 };
 
 module.exports = peerStartup;
