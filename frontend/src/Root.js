@@ -43,9 +43,10 @@ class Root extends React.Component {
 
   componentDidMount() {
     const { store, history } = this.props;
-    // TODO: if (!store.isSessionOnline) {
-    if (false) {
+
+    if (!store.isSessionOnline) {
       history.push('/login');
+      return;
     }
     getDevices().then((devices) => { this.devices = devices; });
 
