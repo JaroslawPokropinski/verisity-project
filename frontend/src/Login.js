@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
+import { toast } from 'react-toastify';
 
 import validate from './credValidator';
 import axios from './axios';
@@ -57,26 +58,33 @@ class Login extends React.Component {
     autoBind(this);
   }
 
+  componentDidMount() {
+    toast('Login: admin, Pass: admin', { autoClose: 50000 });
+  }
+
   onFormSubmit(event) {
     event.preventDefault();
     const { login, password } = this.state;
     const { history, setSession } = this.props;
-    // TODO: validate input
     const valError = validate(login, password);
     if (valError) {
-      // TODO: save session to store
-      axios
-        .post('/login', { login, password })
-        .then(() => {
-          // TODO: redirect to chat
-          setSession(login);
-          history.push('/');
-        })
-        .catch((err) => {
-          // TODO: prompt error
-          console.error(err);
-        });
+      toast.error(valError);
+      return;
     }
+
+    axios
+      .post('/login', { login, password })
+      .then(() => {
+        setSession(login);
+        history.push('/');
+      })
+      .catch((err) => {
+        if (err.response) {
+          toast.error(`Failed to submit form! ${err.response.data}`);
+        } else {
+          toast.error(`Failed to submit form! ${err}`);
+        }
+      });
   }
 
   onLoginChange(event) {

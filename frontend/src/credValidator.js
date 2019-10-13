@@ -3,7 +3,7 @@ const validate = (login, pass) => {
     return 'Login must have at least 3 signs';
   }
 
-  if (pass.length < 8) {
+  if (pass.length < 5) {
     return 'Password must have at least 8 signs';
   }
   return false;

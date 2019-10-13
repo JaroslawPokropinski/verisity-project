@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
+import { toast } from 'react-toastify';
 
 import Chat from './Chat';
 
@@ -45,16 +46,25 @@ class Root extends React.Component {
     const { session, history } = this.props;
 
     if (!session.isSessionOnline) {
-      // TODO: prompt error
+      toast.warn('First you need to log in.');
       history.push('/login');
       return;
     }
-    getDevices().then((devices) => { this.devices = devices; });
+    getDevices().then((devices) => {
+      this.devices = devices;
+      if (!this.devices.audio) {
+        toast.warn('We couldn\'t detect microphone');
+      }
+
+      if (!this.devices.video) {
+        toast.warn('We couldn\'t detect camera');
+      }
+    });
 
     const { peer } = session;
     peer.on('call', (call) => {
       call.on('error', (err) => {
-        alert(`Call error: ${err}`);
+        toast.error(`Call error: ${err}`);
       });
       // Answer the call, providing our mediaStream
       if (navigator.mediaDevices
@@ -73,10 +83,11 @@ class Root extends React.Component {
             });
           })
           .catch((error) => {
-            alert(`Failed to get video with error: ${error}`);
+            toast.error(`Failed to get video with error: ${error}`);
           });
       } else {
-        // Inform user about error (no camera)
+        // Inform user about error
+        toast.error('Your browser doesnt support navigator.mediaDevices');
         call.close();
       }
     });
@@ -102,10 +113,11 @@ class Root extends React.Component {
           });
         })
         .catch((error) => {
-          alert(`Failed to get video with error: ${error}`);
+          toast.error(`Failed to get video with error: ${error}`);
         });
     } else {
-      // Inform user about error (no camera)
+      // Inform user about error
+      toast.error('Your browser doesnt support navigator.mediaDevices');
     }
   }
 

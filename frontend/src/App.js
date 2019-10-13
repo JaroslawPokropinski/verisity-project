@@ -3,6 +3,8 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
 
 
 import Login from './Login';
@@ -32,11 +34,14 @@ class App extends React.Component {
     // Connect peer
     const peer = new Peer();
     peer.on('open', (id) => {
-      console.log(id);
       psetPeer(peer, id);
       this.setState((prevState) => ({
         ...prevState, isPeerOpen: true,
       }));
+    });
+
+    peer.on('error', (error) => {
+      toast.error(`Peerjs: ${error.type}`);
     });
 
     // Check http session
@@ -67,6 +72,7 @@ class App extends React.Component {
 
     return (
       <Container>
+        <ToastContainer />
         <BrowserRouter>
           {
             isPeerOpen && !isSessionPending
