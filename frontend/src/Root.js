@@ -2,8 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
+import { connect } from 'react-redux';
 
-import Store from './Store';
 import Chat from './Chat';
 
 const RootContainer = styled.div`
@@ -42,15 +42,16 @@ class Root extends React.Component {
   }
 
   componentDidMount() {
-    const { store, history } = this.props;
+    const { session, history } = this.props;
 
-    if (!store.isSessionOnline) {
+    if (!session.isSessionOnline) {
+      // TODO: prompt error
       history.push('/login');
       return;
     }
     getDevices().then((devices) => { this.devices = devices; });
 
-    const { peer } = store;
+    const { peer } = session;
     peer.on('call', (call) => {
       call.on('error', (err) => {
         alert(`Call error: ${err}`);
@@ -84,8 +85,8 @@ class Root extends React.Component {
   onCall(id) {
     // on button 'call friend' pressed
     // call server for 'to' id
-    const { store } = this.props;
-    const { peer } = store;
+    const { session } = this.props;
+    const { peer } = session;
     if (navigator.mediaDevices
       && navigator.mediaDevices.getUserMedia
       && navigator.mediaDevices.enumerateDevices) {
@@ -123,8 +124,8 @@ class Root extends React.Component {
 
   render() {
     const { input } = this.state;
-    const { store } = this.props;
-    const { peerId } = store;
+    const { session } = this.props;
+    const { peerId } = session;
 
     return (
       <RootContainer>
@@ -139,8 +140,13 @@ class Root extends React.Component {
 
 Root.propTypes = {
   history: PropTypes.instanceOf(Object).isRequired,
-  store: Store.shape.isRequired,
-
+  session: PropTypes.instanceOf(Object).isRequired,
 };
 
-export default Root;
+const mapStateToProps = (state) => ({
+  session: state.session
+});
+
+const containerRoot = connect(mapStateToProps)(Root);
+
+export default containerRoot;

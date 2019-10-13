@@ -1,83 +1,96 @@
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
-import Peer from './peerjs';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+
 
 import Login from './Login';
 import Root from './Root';
 import axios from './axios';
+import Peer from './peerjs';
+import { setPeer, setSession } from './actions/sessionActions';
+
 
 const Container = styled.div`
   height: 100vh;
   overflow: hidden;
+  padding: 0;
 `;
-
-const updateStore = (update) => this.setState(update);
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    const storeInit = {
+    this.state = {
       isPeerOpen: false,
-      peer: null,
-      peerId: null,
-      isSessionPending: true,
-      isSessionOnline: false,
-      login: null
+      isSessionPending: false,
     };
-
-    this.state = storeInit;
   }
 
   componentDidMount() {
+    const { setPeer: psetPeer, setSession: psetSession } = this.props;
     // Connect peer
     const peer = new Peer();
     peer.on('open', (id) => {
       console.log(id);
+      psetPeer(peer, id);
       this.setState((prevState) => ({
-        ...prevState, peer, isPeerOpen: true, peerId: id
+        ...prevState, isPeerOpen: true,
       }));
     });
 
     // Check http session
     axios.post('/session/create');
-    axios.post('/session/userinfo').then((response) => {
-      const userInfo = response.data;
-      if (userInfo !== '') {
-        this.setState({
-          isSessionPending: false,
-          isSessionOnline: true,
-          login: userInfo.login
-        });
-      } else {
+    axios.post('/session/userinfo')
+      .then((response) => {
+        const userInfo = response.data;
+        if (userInfo !== '') {
+          psetSession(userInfo.login);
+          this.setState({ isSessionPending: false });
+        } else {
+          this.setState({ isSessionPending: false });
+        }
+      })
+      .catch(() => {
         this.setState({ isSessionPending: false });
-      }
-    }).catch(() => {
-      this.setState({ isSessionPending: false });
-    });
+      });
   }
 
   render() {
     const { isPeerOpen, isSessionPending } = this.state;
     const Router = () => (
-      <BrowserRouter>
-        <Switch>
-          <Route path="/login" exact render={(props) => <Login history={props.history} store={this.state} updateStore={updateStore} />} />
-          <Route path="/" exact render={(props) => <Root history={props.history} store={this.state} updateStore={updateStore} />} />
-        </Switch>
-      </BrowserRouter>
+      <Switch>
+        <Route path="/login" exact component={Login} />
+        <Route path="/" exact component={Root} />
+      </Switch>
     );
 
     return (
       <Container>
-        {
-          isPeerOpen && !isSessionPending
-            ? <Router />
-            : 'Loading'
-        }
+        <BrowserRouter>
+          {
+            isPeerOpen && !isSessionPending
+              ? <Router />
+              : 'Loading'
+          }
+        </BrowserRouter>
       </Container>
     );
   }
 }
 
-export default App;
+const mapDispatchToProps = (dispatch) => ({
+  setSession: (login) => {
+    dispatch(setSession(login));
+  },
+  setPeer: (peer, peerId) => {
+    dispatch(setPeer(peer, peerId));
+  },
+});
+
+App.propTypes = {
+  setSession: PropTypes.func.isRequired,
+  setPeer: PropTypes.func.isRequired,
+};
+
+export default connect(null, mapDispatchToProps)(App);
