@@ -20,14 +20,25 @@ router.get('/', (req, res) => {
   res.send('Hello world!');
 });
 
-const UserInfo = (login) => {
+function UserInfo(login) {
   this.login = login;
-};
-
+}
+/**
+ * @swagger
+ * /session/create:
+ *   post:
+ *     summary: Create session
+ */
 router.post('/session/create', (req, res) => {
   res.send(req.session.sessionID);
 });
 
+/**
+ * @swagger
+ * /session/userinfo:
+ *   post:
+ *     summary: Get user information from session
+ */
 router.post('/session/userinfo', (req, res) => {
   if (req.session.login) {
     return res.send(new UserInfo(req.session.login));
@@ -35,6 +46,12 @@ router.post('/session/userinfo', (req, res) => {
   res.send();
 });
 
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Login
+ */
 router.post('/login', (req, res) => {
   if (req.body.login === undefined || req.body.password === undefined) {
     return res.status(400).send();
@@ -48,6 +65,12 @@ router.post('/login', (req, res) => {
   res.status(403).send();
 });
 
+/**
+ * @swagger
+ * /logout:
+ *   post:
+ *     summary: Logout
+ */
 router.post('/logout', (req, res, next) => {
   const name = req.session.login;
   const id = req.sessionID;
@@ -61,6 +84,12 @@ router.post('/logout', (req, res, next) => {
   });
 });
 
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Register
+ */
 router.post('/register', (req, res) => {
   if (req.body.login === undefined || req.body.password === undefined) {
     return res.status(400).send();
