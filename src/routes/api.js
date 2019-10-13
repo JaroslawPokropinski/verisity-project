@@ -54,7 +54,7 @@ router.post('/session/userinfo', (req, res) => {
  */
 router.post('/login', (req, res) => {
   if (req.body.login === undefined || req.body.password === undefined) {
-    return res.status(400).send();
+    return res.status(400).send('Bad request!');
   }
   // check login and password in db
   if (req.body.login === 'admin' && req.body.password === 'admin') {
@@ -62,7 +62,7 @@ router.post('/login', (req, res) => {
     log(`User ${req.session.login} logged in`, req.sessionID);
     return res.send();
   }
-  res.status(403).send();
+  res.status(403).send('Bad login or password!');
 });
 
 /**
