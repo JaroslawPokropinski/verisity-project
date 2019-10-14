@@ -4,6 +4,7 @@
   "description": "Versity-project is an project written for 'Software Development Methods' on Wrocław University of Science.",
   "main": "src/index.js",
   "scripts": {
+    "preinstall": "cd frontend && npm install && npm run build",
     "start": "node src/index.js",
     "dev": "set DEBUG=* & nodemon src/index.js",
     "test": "mocha tests/*.js --timeout 5000 --exit"
