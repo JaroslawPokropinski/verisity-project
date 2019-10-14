@@ -90,7 +90,7 @@ class App extends React.Component {
     return (
       <Container>
         <ToastContainer />
-        <BrowserRouter>
+        <BrowserRouter basename="/app">
           {
             !this.isloading()
               ? <Router />
