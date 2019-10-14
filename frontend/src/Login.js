@@ -59,7 +59,7 @@ class Login extends React.Component {
   }
 
   componentDidMount() {
-    toast('Login: admin, Pass: admin', { autoClose: 50000 });
+    toast('Login: admin, Pass: admin', { autoClose: false });
   }
 
   onFormSubmit(event) {

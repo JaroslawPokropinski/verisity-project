@@ -27,6 +27,12 @@ class App extends React.Component {
       isPeerOpen: false,
       isSessionPending: false,
     };
+
+    this.dismissToast = () => { };
+    this.isloading = () => {
+      const { isPeerOpen, isSessionPending } = this.state;
+      return !isPeerOpen || isSessionPending;
+    };
   }
 
   componentDidMount() {
@@ -38,6 +44,9 @@ class App extends React.Component {
       this.setState((prevState) => ({
         ...prevState, isPeerOpen: true,
       }));
+      if (!this.isloading()) {
+        this.dismissToast();
+      }
     });
 
     peer.on('error', (error) => {
@@ -55,14 +64,22 @@ class App extends React.Component {
         } else {
           this.setState({ isSessionPending: false });
         }
+        if (!this.isloading()) {
+          this.dismissToast();
+        }
       })
       .catch(() => {
         this.setState({ isSessionPending: false });
+        if (!this.isloading()) {
+          this.dismissToast();
+        }
       });
+
+    const toastId = toast.info('Loading...', { autoClose: false, closeOnClick: false });
+    this.dismissToast = () => setTimeout(() => toast.dismiss(toastId), 500);
   }
 
   render() {
-    const { isPeerOpen, isSessionPending } = this.state;
     const Router = () => (
       <Switch>
         <Route path="/login" exact component={Login} />
@@ -75,9 +92,9 @@ class App extends React.Component {
         <ToastContainer />
         <BrowserRouter>
           {
-            isPeerOpen && !isSessionPending
+            !this.isloading()
               ? <Router />
-              : 'Loading'
+              : null
           }
         </BrowserRouter>
       </Container>
