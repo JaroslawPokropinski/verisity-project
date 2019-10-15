@@ -15,4 +15,5 @@ Versity-project is an project written for 'Software Development Methods' on Wroc
 ## Authors
 + Jarosław Pokropiński
 + Piotr Berezowski
++ Mateusz Sopiński
 + ... (Everyone add your name here as first commit)
