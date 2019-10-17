@@ -45,6 +45,7 @@ module.exports = (userService) => {
         res.send();
       })
       .catch((err) => {
+        log(err);
         res.status(403).send(err);
       })
   });
@@ -75,11 +76,14 @@ module.exports = (userService) => {
    *     summary: Register
    */
   router.post('/register', (req, res) => {
-    if (req.body.login === undefined || req.body.password === undefined) {
+    const { login, password } = req.body;
+    if (login === undefined || password === undefined) {
       return res.status(400).send();
     }
-
-    // TODO: add user to database  
+    // add user to database  
+    userService.addUser(login, password)
+      .then((user) => res.send(user))
+      .catch((error) => res.status(400).send(error));
   });
   return router;
 }
