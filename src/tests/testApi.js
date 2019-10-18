@@ -1,7 +1,7 @@
 'use strict';
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const app = require('../src/index');
+const app = require('../index');
 
 chai.use(chaiHttp);
 
@@ -12,7 +12,6 @@ describe("Api routes", function () {
         .post('/api/login')
         .send({ login: 'admin', password: 'admin' });
       chai.expect(res.status).to.eql(200);
-
     });
   });
 });

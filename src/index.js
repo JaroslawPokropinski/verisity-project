@@ -15,17 +15,30 @@ const swagger = require('./config/swaggerConfig');
 const UserService = require('./services/UserService');
 
 const app = express();
-const database = getDatabase();
-const sessionConfig = getSessionConfig(session, database);
-
-// TODO: pass user model
-const userService = new UserService(null);
-
 app.use(cors(corsConfig));
 app.use(bodyParser.json());
 
+// Setup database and session
+const database = getDatabase();
+const sessionConfig = getSessionConfig(session, database);
+// Setup database models
+const UserModel = database.import(path.join(__dirname, 'models', 'UserModel'));
+const userService = new UserService(UserModel);
+// Create table in database and add admin admin
+database.sync()
+  .then(() => userService.cryptPassword('admin'))
+  .then((hash) => {
+    UserModel.create({
+      login: 'admin',
+      hash_password: hash,
+    })
+  });
 app.use(session(sessionConfig));
 sessionConfig.store.sync();
+
+// Setup controllers
+app.use('/api', api(userService));
+app.use(swagger);
 
 // Connect react application
 app.get('/', (_req, res) => {
@@ -35,10 +48,8 @@ app.use(express.static(path.join(__dirname, '../frontend/dist')));
 app.get(['/app', '/app/*'], (_req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
-//
-app.use('/api', api(userService));
-app.use(swagger);
 
+// Setup peerjs and start server
 app.server = peerStartup(app);
 app.server.on('connection', (client) => {
   log(`${client.id} connected!`);
