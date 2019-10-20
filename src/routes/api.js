@@ -1,4 +1,5 @@
 const { Router: getRouter } = require('express');
+const { celebrate, Joi, errors } = require('celebrate');
 const log = require('debug')('api');
 
 module.exports = (userService) => {
@@ -32,16 +33,21 @@ module.exports = (userService) => {
    *   post:
    *     summary: Login
    */
-  router.post('/login', (req, res) => {
-    if (req.body.login === undefined || req.body.password === undefined) {
-      return res.status(400).send('Bad request!');
+  const loginSchema = {
+    body: {
+      login: Joi.string().required(),
+      password: Joi.string().required()
     }
+  }
+
+  router.post('/login', celebrate(loginSchema), (req, res) => {
+    const { login, password } = req.body;
     // check login and password in db
     userService
-      .getUser(req.body.login, req.body.password)
+      .getUser(login, password)
       .then((userInfo) => {
         req.session.userInfo = userInfo;
-        log(`User ${req.body.login} logged in`, req.sessionID);
+        log(`User ${login} logged in`, req.sessionID);
         res.send();
       })
       .catch((err) => {
@@ -75,15 +81,21 @@ module.exports = (userService) => {
    *   post:
    *     summary: Register
    */
-  router.post('/register', (req, res) => {
-    const { login, password } = req.body;
-    if (login === undefined || password === undefined) {
-      return res.status(400).send();
+  const registerSchema = {
+    body: {
+      login: Joi.string().min(3).required(),
+      password: Joi.string().min(8).required()
     }
+  }
+
+  router.post('/register', celebrate(registerSchema), (req, res) => {
+    const { login, password } = req.body;
     // add user to database  
     userService.addUser(login, password)
       .then((user) => res.send(user))
       .catch((error) => res.status(400).send(error));
   });
+
+  router.use(errors());
   return router;
 }
