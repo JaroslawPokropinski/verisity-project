@@ -17,15 +17,16 @@ describe("UserService", function () {
     })
     it("getUser should return admin", (done) => {
       database.sync()
-        .then(() => userService.cryptPassword('admin'))
+        .then(() => userService.cryptPassword('adminadmin'))
         .then((hash) =>
           UserModel.create({
-            login: 'admin',
+            name: 'admin',
+            email: 'admin@example.com',
             hash_password: hash,
           }))
         .then(() => {
-          userService.getUser('admin', 'admin').then((user) => {
-            chai.expect(user.login).to.equal('admin');
+          userService.getUser('admin@example.com', 'adminadmin').then((user) => {
+            chai.expect(user.name).to.equal('admin');
             done();
           }).catch((err) => {
             done(err);
@@ -33,9 +34,9 @@ describe("UserService", function () {
         });
     });
 
-    it("getUser should add user to db", (done) => {
-      database.sync().then(() => userService.addUser('test_user', 'test password'))
-        .then(() => UserModel.findAndCountAll({ where: { login: 'test_user' } }))
+    it("addUser should add user to db", (done) => {
+      database.sync().then(() => userService.addUser('test_user@example.com', 'test_user', 'test password'))
+        .then(() => UserModel.findAndCountAll({ where: { email: 'test_user@example.com' } }))
         .then((result) => {
           chai.expect(result.count).to.equal(1);
           done();
@@ -43,15 +44,17 @@ describe("UserService", function () {
         .catch((err) => done(err));
     });
 
+
     it("getUser should fail adding user with same login", (done) => {
       database.sync()
         .then(() => userService.cryptPassword('test password'))
         .then((hash) =>
           UserModel.create({
-            login: 'test_user',
+            email: 'test_user@example.com',
+            name: 'test_user',
             hash_password: hash,
           }))
-        .then(() => userService.addUser('test_user', 'test password2'))
+        .then(() => userService.addUser('test_user@example.com', 'test_user2', 'test password2'))
         .then(() => done(true))
         .catch(() => done());
     });

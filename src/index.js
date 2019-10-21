@@ -26,10 +26,11 @@ const UserModel = database.import(path.join(__dirname, 'models', 'UserModel'));
 const userService = new UserService(UserModel);
 // Create table in database and add admin admin
 database.sync()
-  .then(() => userService.cryptPassword('admin'))
+  .then(() => userService.cryptPassword('adminadmin'))
   .then((hash) => {
     UserModel.create({
-      login: 'admin',
+      email: 'admin@example.com',
+      name: 'admin',
       hash_password: hash,
     })
   });

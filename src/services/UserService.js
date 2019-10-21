@@ -35,10 +35,10 @@ class UserService {
     })
   }
 
-  getUser(login, password) {
+  getUser(email, password) {
     return new Promise((resolve, reject) => {
       let user = null;
-      this.UserModel.findOne({ where: { login } })
+      this.UserModel.findOne({ where: { email } })
         .then((_user) => {
           if (_user === null) {
             reject('Login or password are incorrect!');
@@ -59,10 +59,10 @@ class UserService {
     });
   }
 
-  addUser(login, password) {
+  addUser(email, name, password) {
     return new Promise((resolve, reject) => {
       this.cryptPassword(password)
-        .then((hash_password) => this.UserModel.create({ login, hash_password }))
+        .then((hash_password) => this.UserModel.create({ email, name, hash_password }))
         .then((user) => resolve(user))
         .catch((error) => reject(error));
     });

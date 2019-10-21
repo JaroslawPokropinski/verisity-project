@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
-import { Link } from 'react-router-dom';
 
 import validate from './credValidator';
 import axios from './axios';
@@ -48,50 +47,34 @@ const Submit = styled.input`
   cursor: pointer;
 `;
 
-const StyledText = styled.span`
-  font-size: 0.8em;
-`;
-
-const StyledLink = styled(Link)`
-  font-size: 0.8em;
-`;
-
-function Register() {
-  return (
-    <div>
-      <StyledText>Are you new?</StyledText>
-      <StyledLink to="/register">Register here</StyledLink>
-    </div>
-  );
-}
-
-class Login extends React.Component {
+class Register extends React.Component {
   constructor() {
     super();
     this.state = {
       email: '',
+      username: '',
       password: '',
+      repeatedPassword: '',
+
     };
 
     autoBind(this);
   }
 
-  componentDidMount() {
-    toast('Email: admin@example.com, Pass: adminadmin', { autoClose: false });
-  }
-
   onFormSubmit(event) {
     event.preventDefault();
-    const { email, password } = this.state;
+    const {
+      email, username, password, repeatedPassword
+    } = this.state;
     const { history, setSession } = this.props;
-    const valError = validate(email, password);
+    const valError = validate(email, password, repeatedPassword, username);
     if (valError) {
       toast.error(valError);
       return;
     }
 
     axios
-      .post('/login', { email, password })
+      .post('/register', { email, name: username, password })
       .then(() => {
         setSession(email);
         history.push('/');
@@ -105,32 +88,52 @@ class Login extends React.Component {
       });
   }
 
-  onLoginChange(event) {
-    this.setState({ email: event.target.value });
+  onUsernameChange(event) {
+    this.setState({ username: event.target.value });
   }
 
   onPassChange(event) {
     this.setState({ password: event.target.value });
   }
 
+  onPassRepChange(event) {
+    this.setState({ repeatedPassword: event.target.value });
+  }
+
+  onEmailChange(event) {
+    this.setState({ email: event.target.value });
+  }
+
   render() {
-    const { email, password } = this.state;
+    const {
+      email, username, password, repeatedPassword
+    } = this.state;
     return (
       <Flex>
         <Container>
           <form onSubmit={this.onFormSubmit}>
             <Label htmlFor="email">
               Email:
-              <TextInput type="text" id="email" onChange={this.onLoginChange} value={email} />
+              <TextInput type="text" id="email" onChange={this.onEmailChange} value={email} />
             </Label>
+
+            <Label htmlFor="username">
+              Username:
+              <TextInput type="text" id="username" onChange={this.onUsernameChange} value={username} />
+            </Label>
+
             <Label htmlFor="password">
               Password:
               <TextInput type="password" id="password" onChange={this.onPassChange} value={password} />
             </Label>
+
+            <Label htmlFor="rep-password">
+              Repeat password:
+              <TextInput type="password" id="rep-password" onChange={this.onPassRepChange} value={repeatedPassword} />
+            </Label>
+
             <Submit type="submit" value="Submit" />
           </form>
-
-          <Register />
         </Container>
       </Flex>
     );
@@ -143,13 +146,13 @@ const mapDispatchToProps = (dispatch) => ({
   }
 });
 
-Login.propTypes = {
+Register.propTypes = {
   history: PropTypes.instanceOf(Object).isRequired,
   setSession: PropTypes.func.isRequired,
 };
-const containerLogin = connect(
+const containerRegister = connect(
   null,
   mapDispatchToProps,
-)(Login);
+)(Register);
 
-export default containerLogin;
+export default containerRegister;
