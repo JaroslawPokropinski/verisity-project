@@ -9,6 +9,7 @@ import 'react-toastify/dist/ReactToastify.min.css';
 
 import Login from './Login';
 import Root from './Root';
+import Register from './Register';
 import axios from './axios';
 import Peer from './peerjs';
 import { setPeer, setSession } from './actions/sessionActions';
@@ -82,6 +83,7 @@ class App extends React.Component {
   render() {
     const Router = () => (
       <Switch>
+        <Route path="/register" exact component={Register} />
         <Route path="/login" exact component={Login} />
         <Route path="/" exact component={Root} />
       </Switch>

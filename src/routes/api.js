@@ -35,19 +35,19 @@ module.exports = (userService) => {
    */
   const loginSchema = {
     body: {
-      login: Joi.string().required(),
+      email: Joi.string().required(),
       password: Joi.string().required()
     }
   }
 
   router.post('/login', celebrate(loginSchema), (req, res) => {
-    const { login, password } = req.body;
+    const { email, password } = req.body;
     // check login and password in db
     userService
-      .getUser(login, password)
+      .getUser(email, password)
       .then((userInfo) => {
         req.session.userInfo = userInfo;
-        log(`User ${login} logged in`, req.sessionID);
+        log(`User ${email} logged in`, req.sessionID);
         res.send();
       })
       .catch((err) => {
@@ -83,15 +83,16 @@ module.exports = (userService) => {
    */
   const registerSchema = {
     body: {
-      login: Joi.string().min(3).required(),
+      email: Joi.string().email().required(),
+      name: Joi.string().min(3).required(),
       password: Joi.string().min(8).required()
     }
   }
 
   router.post('/register', celebrate(registerSchema), (req, res) => {
-    const { login, password } = req.body;
+    const { email, name, password } = req.body;
     // add user to database  
-    userService.addUser(login, password)
+    userService.addUser(email, name, password)
       .then((user) => res.send(user))
       .catch((error) => res.status(400).send(error));
   });

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
 
 import validate from './credValidator';
 import axios from './axios';
@@ -47,11 +48,28 @@ const Submit = styled.input`
   cursor: pointer;
 `;
 
+const StyledText = styled.span`
+  font-size: 0.8em;
+`;
+
+const StyledLink = styled(Link)`
+  font-size: 0.8em;
+`;
+
+function Register() {
+  return (
+    <div>
+      <StyledText>Are you new?</StyledText>
+      <StyledLink to="/register">Register here</StyledLink>
+    </div>
+  );
+}
+
 class Login extends React.Component {
   constructor() {
     super();
     this.state = {
-      login: '',
+      email: '',
       password: '',
     };
 
@@ -59,23 +77,23 @@ class Login extends React.Component {
   }
 
   componentDidMount() {
-    toast('Login: admin, Pass: admin', { autoClose: false });
+    toast('Email: admin@example.com, Pass: adminadmin', { autoClose: false });
   }
 
   onFormSubmit(event) {
     event.preventDefault();
-    const { login, password } = this.state;
+    const { email, password } = this.state;
     const { history, setSession } = this.props;
-    const valError = validate(login, password);
+    const valError = validate(email, password);
     if (valError) {
       toast.error(valError);
       return;
     }
 
     axios
-      .post('/login', { login, password })
+      .post('/login', { email, password })
       .then(() => {
-        setSession(login);
+        setSession(email);
         history.push('/');
       })
       .catch((err) => {
@@ -88,7 +106,7 @@ class Login extends React.Component {
   }
 
   onLoginChange(event) {
-    this.setState({ login: event.target.value });
+    this.setState({ email: event.target.value });
   }
 
   onPassChange(event) {
@@ -96,14 +114,14 @@ class Login extends React.Component {
   }
 
   render() {
-    const { login, password } = this.state;
+    const { email, password } = this.state;
     return (
       <Flex>
         <Container>
           <form onSubmit={this.onFormSubmit}>
-            <Label htmlFor="login">
-              Login:
-              <TextInput type="text" id="login" onChange={this.onLoginChange} value={login} />
+            <Label htmlFor="email">
+              Email:
+              <TextInput type="text" id="email" onChange={this.onLoginChange} value={email} />
             </Label>
             <Label htmlFor="password">
               Password:
@@ -111,6 +129,8 @@ class Login extends React.Component {
             </Label>
             <Submit type="submit" value="Submit" />
           </form>
+
+          <Register />
         </Container>
       </Flex>
     );
