@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "build": "cd frontend && npm run build",
+    "build": "cd frontend && npm i && npm run build",
     "dev": "set DEBUG=* & nodemon src/index.js",
     "test": "mocha src/tests/*.js --timeout 5000 --exit"
   },
