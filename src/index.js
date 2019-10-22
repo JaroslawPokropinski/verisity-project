@@ -24,8 +24,10 @@ const sessionConfig = getSessionConfig(session, database);
 // Setup database models
 const UserModel = database.import(path.join(__dirname, 'models', 'UserModel'));
 const userService = new UserService(UserModel);
-// Create table in database and add admin admin
-database.sync()
+app.use(session(sessionConfig));
+
+// Create tables in database and add admin admin
+database.sync({ force: true })
   .then(() => userService.cryptPassword('adminadmin'))
   .then((hash) => {
     UserModel.create({
@@ -34,8 +36,6 @@ database.sync()
       hash_password: hash,
     })
   });
-app.use(session(sessionConfig));
-sessionConfig.store.sync();
 
 // Setup controllers
 app.use('/api', api(userService));
