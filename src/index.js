@@ -25,7 +25,7 @@ const sessionConfig = getSessionConfig(session, database);
 const UserModel = database.import(path.join(__dirname, 'models', 'UserModel'));
 const userService = new UserService(UserModel);
 // Create table in database and add admin admin
-database.sync()
+UserModel.sync({ force: true })
   .then(() => userService.cryptPassword('adminadmin'))
   .then((hash) => {
     UserModel.create({
