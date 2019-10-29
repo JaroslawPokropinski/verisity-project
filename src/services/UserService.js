@@ -98,29 +98,25 @@ class UserService {
       let userToInviteId = null;
 
       this._getUserId(userName)
-        .then((_userId) => {
-          userId = _userId;
-
-          this._getUserId(userToInviteName)
-            .then((_userToInviteId) => {
-              userToInviteId = _userToInviteId;
-        
-              this.FriendsRelationModel.count({where: {user: userId, friend: userToInviteId}})
-                .then((count) => {
-                  if(count === 0) {
-                    this.FriendsRelationModel.create({ user: userId, friend: userToInviteId, isAccepted: false })
-                      .then((newFriends) => {
-                        // add new relation from friend to user with isAccepted=true ?????
-                        this.FriendsRelationModel.create({ user: userToInviteId, friend: userId, isAccepted: true });
-                        resolve(newFriends);
-                      })
-                      .catch((error) => reject(error));
-                  } else {
-                    reject(userName + ' is already friend with ' + userToInviteName + '!');
-                  }
-                });
-              });
-          });
+        .then((_id) => {
+          userId = _id;
+          this._getUserId(userToInviteName);
+        })
+        .then((_id) => {
+          userToInviteId = _id;
+          this.FriendsRelationModel.count({where: {user: userId, friend: userToInviteId}})
+        })
+        .then((count) => {
+          if(count !== 0) {
+            reject(userName + ' is already friend with ' + userToInviteName + '!');
+          }
+        })
+        .then(() => this.FriendsRelationModel.create({ user: userId, friend: userToInviteId, isAccepted: false }))
+        .then((newRelation) => {
+          this.FriendsRelationModel.create({ user: userToInviteId, friend: userId, isAccepted: true });
+          resolve(newRelation);
+        })
+        .catch((error) => reject(error));
       });
   }
 
@@ -131,27 +127,25 @@ class UserService {
       let userToAcceptId = null;
 
       this._getUserId(userName)
-        .then((_userId) => {
-          userId = _userId;
-
-          this._getUserId(userToAcceptName)
-            .then((_userToAcceptId) => {
-              userToAcceptId = _userToAcceptId;
-
-              this.FriendsRelationModel.findOne({where: {user: userToAcceptId, friend: userId}})
-                .then((friendsRelation) => {
-                  if(friendsRelation === null) {
-                    reject('There is no invitation from ' + userToAcceptName + ' to ' + userName + '!');
-                  }
-                  if(friendsRelation.isAccepted === true) {
-                    reject('Invitation is already accepted!');
-                  }
-                  
-                  friendsRelation.isAccepted = true;
-                  friendsRelation.save().then(() => {});
-                  resolve(friendsRelation);
-                });
-            });
+        .then((_id) => {
+          userId = _id;
+          this._getUserId(userToAcceptName);
+        })
+        .then((_id) => {
+          userToAcceptId = _id;
+          this.FriendsRelationModel.findOne({where: {user: userToAcceptId, friend: userId}})
+        })
+        .then((friendsRelation) => {
+          if(friendsRelation === null) {
+            reject('There is no invitation from ' + userToAcceptName + ' to ' + userName + '!');
+          }
+          if(friendsRelation.isAccepted === true) {
+            reject('Invitation is already accepted!');
+          }
+          
+          friendsRelation.isAccepted = true;
+          friendsRelation.save().then(() => {});
+          resolve(friendsRelation);
         });
     });
   }
