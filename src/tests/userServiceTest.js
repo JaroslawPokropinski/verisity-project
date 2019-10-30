@@ -124,5 +124,22 @@ describe("UserService", function () {
       })
       .catch((err) => done(err));
     });
+
+    it("getFriendsList should return list of friends for specified user", (done) => {
+      database.sync()
+      .then(() => userService.addUser('asd@asd.pl', 'user1', 'user1'))
+      .then(() => userService.addUser('qwe@qwe.pl', 'user2', 'user2'))
+      .then(() => userService.addUser('zxc@zxc.pl', 'user3', 'user3'))
+      .then(() => userService.inviteFriend('user1', 'user2'))
+      .then(() => userService.acceptInvitation('user2', 'user1'))
+      .then(() => userService.inviteFriend('user3', 'user2'))
+      .then(() => userService.acceptInvitation('user2', 'user3'))
+      .then(() => userService.getFriendsList('user2'))
+      .then((friendsList) => {
+        chai.expect(friendsList).to.equal('[{"name":"user1","email":"asd@asd.pl"},{"name":"user3","email":"zxc@zxc.pl"}]');
+      })
+      .then(() => done())
+      .catch((err) => done(err));
+    });
   });
 });

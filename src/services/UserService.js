@@ -1,5 +1,7 @@
 const { genSalt, hash, compare } = require('bcryptjs');
 const log = require('debug')('user');
+const { Sequelize } = require('sequelize');
+const Op = Sequelize.Op;
 // function UserInfo(login) {
 //   this.login = login;
 // }
@@ -89,7 +91,26 @@ class UserService {
   }
 
   getFriendsList(userName) {
-    //TODO
+    return new Promise((resolve, reject) => {
+      let userId = null;
+      
+      this._getUserId(userName)
+        .then((_id) => userId = _id)
+        .then(() => this.FriendsRelationModel.findAll({where: {user: userId, isAccepted: true}, attributes: ['friend']}))
+        .then((friendsIds) => this.UserModel.findAll({
+            where: {
+              id: {
+                [Op.in]: friendsIds.map((i) => i['friend'])
+              }
+            },
+            attributes: ['name', 'email']
+          }))
+        .then((friendsList) => resolve(JSON.stringify(friendsList)))
+        .catch((error) => {
+          log('Database error!', error.message);
+            reject('Database error!');
+        });
+    });
   }
   
   inviteFriend(userName, userToInviteName) {
@@ -98,20 +119,16 @@ class UserService {
       let userToInviteId = null;
 
       this._getUserId(userName)
-        .then((_id) => {
-          userId = _id;
-          this._getUserId(userToInviteName);
-        })
-        .then((_id) => {
-          userToInviteId = _id;
-          this.FriendsRelationModel.count({where: {user: userId, friend: userToInviteId}})
-        })
+        .then((_id) => userId = _id)
+        .then(() => this._getUserId(userToInviteName))
+        .then((_id) => userToInviteId = _id)
+        .then(() => this.FriendsRelationModel.count({where: {user: userId, friend: userToInviteId}}))
         .then((count) => {
           if(count !== 0) {
             reject(userName + ' is already friend with ' + userToInviteName + '!');
           }
+          this.FriendsRelationModel.create({ user: userId, friend: userToInviteId, isAccepted: false });
         })
-        .then(() => this.FriendsRelationModel.create({ user: userId, friend: userToInviteId, isAccepted: false }))
         .then((newRelation) => {
           this.FriendsRelationModel.create({ user: userToInviteId, friend: userId, isAccepted: true });
           resolve(newRelation);
@@ -127,14 +144,10 @@ class UserService {
       let userToAcceptId = null;
 
       this._getUserId(userName)
-        .then((_id) => {
-          userId = _id;
-          this._getUserId(userToAcceptName);
-        })
-        .then((_id) => {
-          userToAcceptId = _id;
-          this.FriendsRelationModel.findOne({where: {user: userToAcceptId, friend: userId}})
-        })
+        .then((_id) => userId = _id)
+        .then(() => this._getUserId(userToAcceptName))
+        .then((_id) => userToAcceptId = _id)
+        .then(() => this.FriendsRelationModel.findOne({where: {user: userToAcceptId, friend: userId}}))
         .then((friendsRelation) => {
           if(friendsRelation === null) {
             reject('There is no invitation from ' + userToAcceptName + ' to ' + userName + '!');
@@ -142,11 +155,12 @@ class UserService {
           if(friendsRelation.isAccepted === true) {
             reject('Invitation is already accepted!');
           }
-          
+
           friendsRelation.isAccepted = true;
           friendsRelation.save().then(() => {});
           resolve(friendsRelation);
-        });
+        })
+        .catch((error) => reject(error));
     });
   }
 }
