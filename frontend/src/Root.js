@@ -5,11 +5,18 @@ import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 
-import Chat from './Chat';
+import Content from './Content';
 
 const RootContainer = styled.div`
-
+  display: flex;
+  height: 100vh;
 `;
+
+const ConnectContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+const FriendList = styled.div``;
 
 const getDevices = () => new Promise((resolve) => {
   if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
@@ -46,7 +53,6 @@ class Root extends React.Component {
     const { session, history } = this.props;
 
     if (!session.isSessionOnline) {
-      toast.warn('First you need to log in.');
       history.push('/login');
       return;
     }
@@ -141,10 +147,15 @@ class Root extends React.Component {
 
     return (
       <RootContainer>
-        {peerId}
-        <input type="text" onChange={this.onInput} value={input} />
-        <input type="submit" value="Connect" onClick={this.onClick} />
-        <Chat onVideo={this.onVideo} />
+        <ConnectContainer>
+          {peerId}
+          <input type="text" onChange={this.onInput} value={input} />
+          <input type="submit" value="Connect" onClick={this.onClick} />
+        </ConnectContainer>
+
+        <FriendList />
+        <Content selected={null} />
+        {/* <Chat onVideo={this.onVideo} /> */}
       </RootContainer>
     );
   }
