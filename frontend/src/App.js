@@ -26,7 +26,7 @@ class App extends React.Component {
     super(props);
     this.state = {
       isPeerOpen: false,
-      isSessionPending: false,
+      isSessionPending: true,
     };
 
     this.dismissToast = () => { };
