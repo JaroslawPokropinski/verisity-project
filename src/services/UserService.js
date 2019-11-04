@@ -153,7 +153,6 @@ class UserService {
           this.FriendsRelationModel.create({ user: userId, friend: userToInviteId, isAccepted: false });
         })
         .then((newRelation) => {
-          this.FriendsRelationModel.create({ user: userToInviteId, friend: userId, isAccepted: true });
           resolve(newRelation);
         })
         .catch((error) => reject(error));
@@ -181,6 +180,7 @@ class UserService {
 
           friendsRelation.isAccepted = true;
           friendsRelation.save().then(() => {});
+          this.FriendsRelationModel.create({ user: userId, friend: userToAcceptId, isAccepted: true });
           resolve(friendsRelation);
         })
         .catch((error) => reject(error));

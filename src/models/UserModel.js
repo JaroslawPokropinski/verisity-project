@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Sequelize.Model { }
   User.init({
@@ -26,5 +27,14 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'user'
   });
+
+  User.belongsToMany(User, {
+    as: 'friend',
+    // through: FriendsRelation,
+    through: 'friends_relations',
+    foreignKey: 'user',
+    otherKey: 'friend'
+  });
+
   return User;
 };
