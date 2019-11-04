@@ -141,5 +141,18 @@ describe("UserService", function () {
       .then(() => done())
       .catch((err) => done(err));
     });
+
+    it("getPendingInvitations should return list of invitations for specified user", (done) => {
+      database.sync()
+      .then(() => userService.addUser('asd@asd.pl', 'user1', 'user1'))
+      .then(() => userService.addUser('qwe@qwe.pl', 'user2', 'user2'))
+      .then(() => userService.inviteFriend('user1', 'user2'))
+      .then(() => userService.getPendingInvitations('user2'))
+      .then((invitations) => {
+        chai.expect(invitations).to.equal('[{"name":"user1","email":"asd@asd.pl"}]');
+      })
+      .then(() => done())
+      .catch((err) => done(err));
+    });
   });
 });

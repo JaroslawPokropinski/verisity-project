@@ -112,6 +112,29 @@ class UserService {
         });
     });
   }
+
+  getPendingInvitations(userName) {
+    return new Promise((resolve, reject) => {
+      let userId = null;
+
+      this._getUserId(userName)
+        .then((_id) => userId = _id)
+        .then(() => this.FriendsRelationModel.findAll({where: {friend: userId, isAccepted: false}, attributes: ['user']}))
+        .then((ids) => this.UserModel.findAll({
+          where: {
+            id: {
+              [Op.in]: ids.map((i) => i['user'])
+            }
+          },
+          attributes: ['name', 'email']
+        }))
+        .then((friendsList) => resolve(JSON.stringify(friendsList)))
+        .catch((error) => {
+          log('Database error!', error.message);
+          reject('Database error!');
+        })
+    });
+  }
   
   inviteFriend(userName, userToInviteName) {
     return new Promise((resolve, reject) => {
