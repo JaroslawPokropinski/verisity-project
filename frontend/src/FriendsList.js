@@ -2,41 +2,35 @@ import React from 'react';
 
 
 const userStyles = {
-  display:'inline-block'
+  display: 'inline-block'
 };
 
-const allUsers = ["Jarosław", "Piotr", "Wojciech", "Mateusz"];
+const allUsers = ['Jarosław', 'Piotr', 'Wojciech', 'Mateusz'];
 
 
 function FriendListComponent() {
   return (
     <div className="FriendListComponent">
-      <FriendsComponent allUsersList={allUsers}/>
+      <FriendsComponent allUsersList={allUsers} />
     </div>
-  )
+  );
 }
 
 
 class FriendsComponent extends React.Component {
-  constructor({allUsersList}) {
+  constructor({ allUsersList }) {
     super();
     this.state = {
       filteredUsers: allUsersList
-    }
+    };
 
     this.filter = this.filter.bind(this);
   }
 
-  render() {
-    return (
-      <div>
-        <input 
-          className="findUsersInput"
-          onChange={this.filter}>
-        </input>
-        <UsersList users={this.state.filteredUsers} />
-      </div>
-    )
+  getFilteredUsers(text) {
+    return this.props.allUsersList.filter(
+      (user) => user.toLowerCase().includes(text.toLowerCase())
+    );
   }
 
   filter(e) {
@@ -47,44 +41,56 @@ class FriendsComponent extends React.Component {
     });
   }
 
-  getFilteredUsers(text) {
-    return this.props.allUsersList.filter(user => user.toLowerCase().includes(text.toLowerCase()));
+  render() {
+    return (
+      <div>
+        <input 
+          className="findUsersInput"
+          onChange={this.filter}
+        />
+        <UsersList users={this.state.filteredUsers} />
+      </div>
+    );
   }
 }
 
 
 // create dynamic user list for all filtered users
-function UsersList({users}) {
+function UsersList({ users }) {
   if (users.length > 0) {
     return (
       <div>
-        {users.map(user => <User key={user} name={user} />)}
+        {users.map((user) => <User key={user} name={user} />)}
       </div>
-    )
+    );
   }
 
   return (
     <p>No results</p>
-  )  
+  );  
 }
 
 
 // single user row
-function User({name}) {
+function User({ name }) {
   return (
     <div className="user">
       <Image style={userStyles} name={name} />
       <p style={userStyles}>{name}</p>
     </div>
-  )
+  );
 }
 
 
 // user avatar
-function Image({name}) {
+function Image({ name }) {
   const imgUrl = `https://api.adorable.io/avatars/55/${name}.png`;
   return (
-    <img src={imgUrl} className="user_avatar" />
+    <img 
+      src={imgUrl} 
+      className="user_avatar"
+      alt="" 
+    />
   );
 }
 
