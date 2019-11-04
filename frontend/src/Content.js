@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 const ContentContainer = styled.div`
   height: 100%;
   width: 100%;
-  margin: 8px;
+  box-sizing: border-box;
   padding: 8px;
 `;
 
@@ -58,7 +58,6 @@ class Content extends React.Component {
       <ContentContainer>
         <ConditionalContent selected={selected} />
       </ContentContainer>
-
     );
   }
 }
