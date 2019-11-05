@@ -1,5 +1,5 @@
 import React from 'react';
-
+import PropTypes from 'prop-types';
 
 const userStyles = {
   display: 'inline-block'
@@ -70,28 +70,49 @@ function UsersList({ users }) {
   );  
 }
 
+const clickAlert = () => alert('Kliknięto!');
+
 
 // single user row
 function User({ name }) {
+  const avatarUrl = `https://api.adorable.io/avatars/55/${name}.png`;
   return (
     <div className="user">
-      <Image style={userStyles} name={name} />
+      <Image 
+        style={userStyles} 
+        className="user_avatar"
+        src={avatarUrl}
+      />
       <p style={userStyles}>{name}</p>
+      <button 
+        onClick={clickAlert}
+        type="button"
+      >
+        <Image
+          style={userStyles}
+          className="phone_icon"
+          src={require('./resources/image/phone_image.png')}
+          
+        />
+      </button>
     </div>
   );
 }
 
-
 // user avatar
-function Image({ name }) {
-  const imgUrl = `https://api.adorable.io/avatars/55/${name}.png`;
+function Image({ className, src }) {
   return (
-    <img 
-      src={imgUrl} 
-      className="user_avatar"
+    <img
+      src={src} 
+      className={className}
       alt="" 
     />
   );
 }
+
+Image.propTypes = {
+  className: PropTypes.string.isRequired,
+  src: PropTypes.string.isRequired,
+};
 
 export default FriendListComponent;
