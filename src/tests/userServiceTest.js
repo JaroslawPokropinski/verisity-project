@@ -8,14 +8,14 @@ describe("UserService", function () {
   describe("password encorder", function () {
     let database = null;
     let UserModel = null;
-    let FriendsRelationModel = null;
+    let FriendsModel = null;
     let userService = null;
 
     beforeEach(() => {
       database = new Sequelize('sqlite::memory:', { logging: null });
       UserModel = database.import(path.join(__dirname, '..', 'models', 'UserModel'));
-      FriendsRelationModel = database.import(path.join(__dirname, '..', 'models', 'FriendsRelationModel'));
-      userService = new UserService(UserModel, FriendsRelationModel);
+      FriendsModel = database.import(path.join(__dirname, '..', 'models', 'FriendsModel'));
+      userService = new UserService(UserModel, FriendsModel);
     })
 
     it("getUser should return admin", (done) => {
@@ -66,14 +66,14 @@ describe("UserService", function () {
   describe("friends relation", function() {
     let database = null;
     let UserModel = null;
-    let FriendsRelationModel = null;
+    let FriendsModel = null;
     let userService = null;
 
     beforeEach(() => {
       database = new Sequelize('sqlite::memory:', { logging: null });
       UserModel = database.import(path.join(__dirname, '..', 'models', 'UserModel'));
-      FriendsRelationModel = database.import(path.join(__dirname, '..', 'models', 'FriendsRelationModel'));
-      userService = new UserService(UserModel, FriendsRelationModel);
+      FriendsModel = database.import(path.join(__dirname, '..', 'models', 'FriendsModel'));
+      userService = new UserService(UserModel, FriendsModel);
     })
 
     it("inviteFriend should send invitation from one user to another", (done) => {
@@ -89,7 +89,7 @@ describe("UserService", function () {
             .then((_id1) => user1 = _id1)
             .then(() => userService._getUserId('user2'))
             .then((_id2) => user2 = _id2)
-            .then(() => FriendsRelationModel.findOne({where: {user: user1, friend: user2}}))
+            .then(() => FriendsModel.findOne({where: {user: user1, friend: user2}}))
             .then((relation) => {
               chai.expect(relation).to.not.equal(null);
               chai.expect(relation.isAccepted).to.equal(false);
@@ -114,7 +114,7 @@ describe("UserService", function () {
           .then((_id1) => user1 = _id1)
           .then(() => userService._getUserId('user2'))
           .then((_id2) => user2 = _id2)
-          .then(() => FriendsRelationModel.findOne({where: {user: user1, friend: user2}}))
+          .then(() => FriendsModel.findOne({where: {user: user1, friend: user2}}))
           .then((relation) => {
             chai.expect(relation).to.not.equal(null);
             chai.expect(relation.isAccepted).to.equal(true);
@@ -136,7 +136,7 @@ describe("UserService", function () {
       .then(() => userService.acceptInvitation('user2', 'user3'))
       .then(() => userService.getFriendsList('user2'))
       .then((friendsList) => {
-        chai.expect(friendsList).to.equal('[{"name":"user1","email":"asd@asd.pl"},{"name":"user3","email":"zxc@zxc.pl"}]');
+        chai.expect(JSON.stringify(friendsList)).to.equal('[{"name":"user1","email":"asd@asd.pl"},{"name":"user3","email":"zxc@zxc.pl"}]');
       })
       .then(() => done())
       .catch((err) => done(err));
@@ -149,7 +149,7 @@ describe("UserService", function () {
       .then(() => userService.inviteFriend('user1', 'user2'))
       .then(() => userService.getPendingInvitations('user2'))
       .then((invitations) => {
-        chai.expect(invitations).to.equal('[{"name":"user1","email":"asd@asd.pl"}]');
+        chai.expect(JSON.stringify(invitations)).to.equal('[{"name":"user1","email":"asd@asd.pl"}]');
       })
       // .then(() => userService.UserModel.findOne({where: {name: 'user1'}}).then((user) => user.getFriend({logging: console.log})).then((friends) => {console.log(friends); console.log(JSON.stringify(friends));}))
       .then(() => done())

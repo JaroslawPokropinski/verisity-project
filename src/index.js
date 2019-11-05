@@ -24,8 +24,8 @@ const sessionConfig = getSessionConfig(session, database);
 // Setup database models
 const UserModel = database.import(path.join(__dirname, 'models', 'UserModel'));
 // FriendsRelation Model
-const FriendsRelationModel = database.import(path.join(__dirname, 'models', 'FriendsRelationModel'));
-const userService = new UserService(UserModel, FriendsRelationModel);
+const FriendsModel = database.import(path.join(__dirname, 'models', 'FriendsModel'));
+const userService = new UserService(UserModel, FriendsModel);
 app.use(session(sessionConfig));
 
 // Create tables in database and add admin admin

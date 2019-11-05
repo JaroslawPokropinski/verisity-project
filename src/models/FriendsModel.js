@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class FriendsRelation extends Sequelize.Model { }
-  FriendsRelation.init({
+  class Friends extends Sequelize.Model { }
+  Friends.init({
     user: {
       primaryKey: true,
       type: DataTypes.INTEGER,
@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     sequelize,
-    modelName: 'friends_relation'
+    modelName: 'friend'
   });
-  return FriendsRelation;
+  return Friends;
 };

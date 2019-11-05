@@ -14,11 +14,11 @@ class UserService {
   /**
    * @param {Model} UserModel 
    */
-  constructor(UserModel, FriendsRelationModel) {
+  constructor(UserModel, FriendsModel) {
     this.UserModel = UserModel;
-    this.FriendsRelationModel = FriendsRelationModel;
+    this.FriendsModel = FriendsModel;
     log(JSON.stringify(UserModel));
-    log(JSON.stringify(FriendsRelationModel));
+    log(JSON.stringify(FriendsModel));
   }
 
   cryptPassword(password) {
@@ -94,7 +94,7 @@ class UserService {
     return new Promise((resolve, reject) => {
       this.UserModel.findOne({where: {name: userName}})
         .then((user) => user.getFriend({where: {}, through: {isAccepted: true}, attributes: ['name', 'email'], includeIgnoreAttributes: false}))
-        .then((friendsList) => resolve(JSON.stringify(friendsList)))
+        .then((friendsList) => resolve(friendsList))
         .catch((error) => {
           log('Database error!', error.message);
           reject('Database error!');
@@ -106,7 +106,7 @@ class UserService {
     return new Promise((resolve, reject) => {
       this.UserModel.findOne({where: {name: userName}})
         .then((user) => user.getUser({where: {}, through: {isAccepted: false}, attributes: ['name', 'email'], includeIgnoreAttributes: false}))
-        .then((pendingInvitations) => resolve(JSON.stringify(pendingInvitations)))
+        .then((pendingInvitations) => resolve(pendingInvitations))
         .catch((error) => {
           log('Database error!', error.message);
           reject('Database error!');
@@ -139,7 +139,7 @@ class UserService {
         .then((_userToAccept) => userToAccept = _userToAccept)
         .then(() => this.UserModel.findOne({where: {name: userName}}))
         .then((_user) => user = _user)
-        .then(() => this.FriendsRelationModel.findOne({where:{user: userToAccept.id, friend: user.id}}))
+        .then(() => this.FriendsModel.findOne({where:{user: userToAccept.id, friend: user.id}}))
         .then((relation) => {
           relation.isAccepted = true;
           relation.save();
