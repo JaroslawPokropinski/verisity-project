@@ -24,3 +24,13 @@ body {
 html {
   height: 100vh;
 }
+
+.FriendListComponent {
+  width: 400px;
+}
+
+.phone_icon {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+}
