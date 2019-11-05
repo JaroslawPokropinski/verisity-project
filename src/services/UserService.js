@@ -92,98 +92,64 @@ class UserService {
 
   getFriendsList(userName) {
     return new Promise((resolve, reject) => {
-      let userId = null;
-      
-      this._getUserId(userName)
-        .then((_id) => userId = _id)
-        .then(() => this.FriendsRelationModel.findAll({where: {user: userId, isAccepted: true}, attributes: ['friend']}))
-        .then((friendsIds) => this.UserModel.findAll({
-            where: {
-              id: {
-                [Op.in]: friendsIds.map((i) => i['friend'])
-              }
-            },
-            attributes: ['name', 'email']
-          }))
+      this.UserModel.findOne({where: {name: userName}})
+        .then((user) => user.getFriend({where: {}, through: {isAccepted: true}, attributes: ['name', 'email'], includeIgnoreAttributes: false}))
         .then((friendsList) => resolve(JSON.stringify(friendsList)))
         .catch((error) => {
           log('Database error!', error.message);
-            reject('Database error!');
+          reject('Database error!');
         });
     });
   }
 
   getPendingInvitations(userName) {
     return new Promise((resolve, reject) => {
-      let userId = null;
-
-      this._getUserId(userName)
-        .then((_id) => userId = _id)
-        .then(() => this.FriendsRelationModel.findAll({where: {friend: userId, isAccepted: false}, attributes: ['user']}))
-        .then((ids) => this.UserModel.findAll({
-          where: {
-            id: {
-              [Op.in]: ids.map((i) => i['user'])
-            }
-          },
-          attributes: ['name', 'email']
-        }))
-        .then((friendsList) => resolve(JSON.stringify(friendsList)))
+      this.UserModel.findOne({where: {name: userName}})
+        .then((user) => user.getUser({where: {}, through: {isAccepted: false}, attributes: ['name', 'email'], includeIgnoreAttributes: false}))
+        .then((pendingInvitations) => resolve(JSON.stringify(pendingInvitations)))
         .catch((error) => {
           log('Database error!', error.message);
           reject('Database error!');
-        })
+        });
     });
   }
   
   inviteFriend(userName, userToInviteName) {
     return new Promise((resolve, reject) => {
-      let userId = null;
-      let userToInviteId = null;
-
-      this._getUserId(userName)
-        .then((_id) => userId = _id)
-        .then(() => this._getUserId(userToInviteName))
-        .then((_id) => userToInviteId = _id)
-        .then(() => this.FriendsRelationModel.count({where: {user: userId, friend: userToInviteId}}))
-        .then((count) => {
-          if(count !== 0) {
-            reject(userName + ' is already friend with ' + userToInviteName + '!');
-          }
-          this.FriendsRelationModel.create({ user: userId, friend: userToInviteId, isAccepted: false });
-        })
-        .then((newRelation) => {
-          resolve(newRelation);
-        })
-        .catch((error) => reject(error));
+      let userToInvite = null;
+      this.UserModel.findOne({where: {name: userToInviteName}})
+        .then((_userToInvite) => userToInvite = _userToInvite)
+        .then(() => this.UserModel.findOne({where: {name: userName}}))
+        .then((user) => user.addFriend(userToInvite, {through: {isAccepted: false}}))
+        .then((created) => resolve(created))
+        .catch((error) => {
+          log('Database error!', error.message);
+          reject('Database error!');
+        });
       });
   }
 
 
   acceptInvitation(userName, userToAcceptName) {
     return new Promise((resolve, reject) => {
-      let userId = null;
-      let userToAcceptId = null;
+      let userToAccept = null;
+      let user = null;
 
-      this._getUserId(userName)
-        .then((_id) => userId = _id)
-        .then(() => this._getUserId(userToAcceptName))
-        .then((_id) => userToAcceptId = _id)
-        .then(() => this.FriendsRelationModel.findOne({where: {user: userToAcceptId, friend: userId}}))
-        .then((friendsRelation) => {
-          if(friendsRelation === null) {
-            reject('There is no invitation from ' + userToAcceptName + ' to ' + userName + '!');
-          }
-          if(friendsRelation.isAccepted === true) {
-            reject('Invitation is already accepted!');
-          }
-
-          friendsRelation.isAccepted = true;
-          friendsRelation.save().then(() => {});
-          this.FriendsRelationModel.create({ user: userId, friend: userToAcceptId, isAccepted: true });
-          resolve(friendsRelation);
+      this.UserModel.findOne({where: {name: userToAcceptName}})
+        .then((_userToAccept) => userToAccept = _userToAccept)
+        .then(() => this.UserModel.findOne({where: {name: userName}}))
+        .then((_user) => user = _user)
+        .then(() => this.FriendsRelationModel.findOne({where:{user: userToAccept.id, friend: user.id}}))
+        .then((relation) => {
+          relation.isAccepted = true;
+          relation.save();
         })
-        .catch((error) => reject(error));
+        .then(() => user.addFriend(userToAccept, {through: {isAccepted: true}}))
+        .then((result) => resolve(result))
+        .catch((error) => {
+          log('Database error!', error.message);
+          reject('Database error!');
+        });
     });
   }
 }

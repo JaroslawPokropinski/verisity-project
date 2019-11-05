@@ -151,7 +151,7 @@ describe("UserService", function () {
       .then((invitations) => {
         chai.expect(invitations).to.equal('[{"name":"user1","email":"asd@asd.pl"}]');
       })
-      // .then(() => userService.UserModel.findOne({where: {name: 'user1'}}).then((user) => user.getFriend({logging: console.log})).then((friends) => console.log(friends)))
+      // .then(() => userService.UserModel.findOne({where: {name: 'user1'}}).then((user) => user.getFriend({logging: console.log})).then((friends) => {console.log(friends); console.log(JSON.stringify(friends));}))
       .then(() => done())
       .catch((err) => done(err));
     });

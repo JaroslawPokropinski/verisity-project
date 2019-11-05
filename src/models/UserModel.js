@@ -36,5 +36,13 @@ module.exports = (sequelize, DataTypes) => {
     otherKey: 'friend'
   });
 
+  User.belongsToMany(User, {
+    as: 'user',
+    // through: FriendsRelation,
+    through: 'friends_relations',
+    foreignKey: 'friend',
+    otherKey: 'user'
+  });
+
   return User;
 };
