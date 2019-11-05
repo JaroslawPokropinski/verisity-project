@@ -1,7 +1,5 @@
 const { genSalt, hash, compare } = require('bcryptjs');
 const log = require('debug')('user');
-const { Sequelize } = require('sequelize');
-const Op = Sequelize.Op;
 // function UserInfo(login) {
 //   this.login = login;
 // }
@@ -78,7 +76,7 @@ class UserService {
       this.UserModel.findOne({where: {name: userName}})
         .then((user) => {
           if(user === null) {
-            reject('There is no such user as ' + userName + '!');
+            reject('There is no such user as ${userName}!');
           } else {
             resolve(user.id);
           }
