@@ -22,9 +22,8 @@ app.use(bodyParser.json());
 const database = getDatabase();
 const sessionConfig = getSessionConfig(session, database);
 // Setup database models
-const UserModel = database.import(path.join(__dirname, 'models', 'UserModel'));
-// FriendsRelation Model
-const FriendsModel = database.import(path.join(__dirname, 'models', 'FriendsModel'));
+const UserModel = database['models']['user'];
+const FriendsModel = database['models']['friends_relations'];
 const userService = new UserService(UserModel, FriendsModel);
 app.use(session(sessionConfig));
 
