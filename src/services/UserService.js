@@ -71,23 +71,6 @@ class UserService {
   }
 
   //FriendsRelation function
-  _getUserId(userName) {
-    return new Promise((resolve, reject) => {
-      this.UserModel.findOne({where: {name: userName}})
-        .then((user) => {
-          if(user === null) {
-            reject('There is no such user as ${userName}!');
-          } else {
-            resolve(user.id);
-          }
-        })
-        .catch((error) => {
-          log('Database error!', error.message);
-          reject('Database error!');
-        })
-    });
-  }
-
   getFriendsList(userName) {
     return new Promise((resolve, reject) => {
       this.UserModel.findOne({where: {name: userName}})

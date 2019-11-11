@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
-
+// var FriendsModel = require('./FriendsModel').Friends;
+// console.log(FriendsModel);
 module.exports = (sequelize, DataTypes) => {
   class User extends Sequelize.Model { }
   User.init({

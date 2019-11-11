@@ -83,16 +83,13 @@ describe("UserService", function () {
         .then(() => userService.inviteFriend('user1', 'user2'))
         .then(() => {
           let user1 = null;
-          let user2 = null;
 
-          userService._getUserId('user1')
-            .then((_id1) => user1 = _id1)
-            .then(() => userService._getUserId('user2'))
-            .then((_id2) => user2 = _id2)
-            .then(() => FriendsModel.findOne({where: {user: user1, friend: user2}}))
-            .then((relation) => {
-              chai.expect(relation).to.not.equal(null);
-              chai.expect(relation.isAccepted).to.equal(false);
+          UserModel.findOne({where: {name: 'user1'}})
+            .then((_user1) => user1 = _user1)
+            .then(() => user1.getFriend({where: {}, through: {isAccepted: false}}))
+            .then((invited_user) => {
+              chai.expect(invited_user).to.not.equal(null);
+              chai.expect(invited_user[0].name).to.equal('user2');
             })
             .then((result) => done(result))
             .catch((err) => done(err));
@@ -107,20 +104,17 @@ describe("UserService", function () {
       .then(() => userService.inviteFriend('user1', 'user2'))
       .then(() => userService.acceptInvitation('user2', 'user1'))
       .then(() => {
-        let user1 = null;
-        let user2 = null;
+        let user = null;
 
-        userService._getUserId('user1')
-          .then((_id1) => user1 = _id1)
-          .then(() => userService._getUserId('user2'))
-          .then((_id2) => user2 = _id2)
-          .then(() => FriendsModel.findOne({where: {user: user1, friend: user2}}))
-          .then((relation) => {
-            chai.expect(relation).to.not.equal(null);
-            chai.expect(relation.isAccepted).to.equal(true);
-          })
-          .then((result) => done(result))
-          .catch((err) => done(err));
+        UserModel.findOne({where: {name: 'user1'}})
+            .then((_user) => user = _user)
+            .then(() => user.getFriend({where: {}, through: {isAccepted: true}}))
+            .then((invited_user) => {
+              chai.expect(invited_user).to.not.equal(null);
+              chai.expect(invited_user[0].name).to.equal('user2');
+            })
+            .then((result) => done(result))
+            .catch((err) => done(err));
       })
       .catch((err) => done(err));
     });
