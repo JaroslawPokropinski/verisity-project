@@ -74,7 +74,7 @@ class UserService {
   getFriendsList(userName) {
     return new Promise((resolve, reject) => {
       this.UserModel.findOne({where: {name: userName}})
-        .then((user) => user.getFriend({where: {}, through: {isAccepted: true}, attributes: ['name', 'email'], includeIgnoreAttributes: false}))
+        .then((user) => user.getFriend({where: {}, through: {where: {isAccepted: true}}, attributes: ['name', 'email'], includeIgnoreAttributes: false}))
         .then((friendsList) => resolve(friendsList))
         .catch((error) => {
           log('Database error!', error.message);
@@ -86,7 +86,7 @@ class UserService {
   getPendingInvitations(userName) {
     return new Promise((resolve, reject) => {
       this.UserModel.findOne({where: {name: userName}})
-        .then((user) => user.getUser({where: {}, through: {isAccepted: false}, attributes: ['name', 'email'], includeIgnoreAttributes: false}))
+        .then((user) => user.getUser({where: {}, through: {where: {isAccepted: false}}, attributes: ['name', 'email'], includeIgnoreAttributes: false}))
         .then((pendingInvitations) => resolve(pendingInvitations))
         .catch((error) => {
           log('Database error!', error.message);
@@ -100,6 +100,7 @@ class UserService {
       let userToInvite = null;
       this.UserModel.findOne({where: {name: userToInviteName}})
         .then((_userToInvite) => userToInvite = _userToInvite)
+        // .then(() => console.log(userToInvite))
         .then(() => this.UserModel.findOne({where: {name: userName}}))
         .then((user) => user.addFriend(userToInvite, {through: {isAccepted: false}}))
         .then((created) => resolve(created))
@@ -120,8 +121,12 @@ class UserService {
         .then((_userToAccept) => userToAccept = _userToAccept)
         .then(() => this.UserModel.findOne({where: {name: userName}}))
         .then((_user) => user = _user)
-        .then(() => this.FriendsModel.findOne({where:{user: userToAccept.id, friend: user.id}}))
+        .then(() => this.FriendsModel.findOne({where:{user: userToAccept.id, friend: user.id, isAccepted: false}}))
         .then((relation) => {
+          if(relation === null) {
+            log(`Users are friends already, or there is no invitation from user ${userToAcceptName} to user ${userName}!`);
+            reject(`Users are friends already, or there is no invitation from user ${userToAcceptName} to user ${userName}!`);
+          }
           relation.isAccepted = true;
           relation.save();
         })

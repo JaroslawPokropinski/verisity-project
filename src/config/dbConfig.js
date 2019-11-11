@@ -1,12 +1,37 @@
 const Sequelize = require('sequelize');
 const path = require('path');
 const log = require('debug')('database');
+const fs = require('fs')
+const models_dir = path.join(__dirname, '..', 'models');
+
+
 
 const getDatabase = () => {
+  let sequelize = null;
   if (process.env.NODE_ENV === 'production') {
-    return getProdDatabase();
+    sequelize = getProdDatabase();
+  } else {
+    sequelize = getDevdatabase();
   }
-  return getDevdatabase();
+
+  // Initialize models and create associations
+  fs
+    .readdirSync(models_dir)
+    .filter(file => {
+      return (file.indexOf('.') !== 0) && (file.slice(-3) === '.js');
+    })
+    .forEach(file => {
+      var model = sequelize['import'](path.join(models_dir, file));
+      sequelize['models'][model.name] = model;
+    });
+
+  Object.keys(sequelize['models']).forEach(modelName => {
+    if(sequelize['models'][modelName].associate) {
+      sequelize['models'][modelName].associate(sequelize['models']);
+    }
+  });
+
+  return sequelize
 }
 
 const getProdDatabase = () => {

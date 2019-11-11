@@ -1,6 +1,5 @@
 const Sequelize = require('sequelize');
-// var FriendsModel = require('./FriendsModel').Friends;
-// console.log(FriendsModel);
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Sequelize.Model { }
   User.init({
@@ -28,21 +27,22 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'user'
   });
-
-  User.belongsToMany(User, {
-    as: 'friend',
-    // through: FriendsRelation,
-    through: 'friends',
-    foreignKey: 'user',
-    otherKey: 'friend'
-  });
-
-  User.belongsToMany(User, {
-    as: 'user',
-    through: 'friends',
-    foreignKey: 'friend',
-    otherKey: 'user'
-  });
+  
+  User.associate = function(models) {
+    models['user'].belongsToMany(models['user'], {
+      as: 'user',
+      through: models['friends_relations'],
+      foreignKey: 'friend',
+      otherKey: 'user'
+    });
+    
+    models['user'].belongsToMany(models['user'], {
+      as: 'friend',
+      through: models['friends_relations'],
+      foreignKey: 'user',
+      otherKey: 'friend'
+    });
+  }
 
   return User;
 };

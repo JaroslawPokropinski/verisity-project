@@ -3,6 +3,7 @@ const chai = require('chai');
 const path = require('path');
 const { Sequelize } = require('sequelize');
 const UserService = require('../services/UserService');
+const getDatabase = require('../config/dbConfig');
 
 describe("UserService", function () {
   describe("password encorder", function () {
@@ -12,14 +13,17 @@ describe("UserService", function () {
     let userService = null;
 
     beforeEach(() => {
-      database = new Sequelize('sqlite::memory:', { logging: null });
-      UserModel = database.import(path.join(__dirname, '..', 'models', 'UserModel'));
-      FriendsModel = database.import(path.join(__dirname, '..', 'models', 'FriendsModel'));
+      // database = new Sequelize('sqlite::memory:', { logging: null });
+      // UserModel = database.import(path.join(__dirname, '..', 'models', 'UserModel'));
+      // FriendsModel = database.import(path.join(__dirname, '..', 'models', 'FriendsModel'));
+      database = getDatabase()
+      UserModel = database['models']['user']
+      FriendsModel = database['models']['friends_relations']
       userService = new UserService(UserModel, FriendsModel);
     })
 
     it("getUser should return admin", (done) => {
-      database.sync()
+      database.sync({force: true})
         .then(() => userService.cryptPassword('adminadmin'))
         .then((hash) =>
           UserModel.create({
@@ -38,7 +42,8 @@ describe("UserService", function () {
     });
 
     it("addUser should add user to db", (done) => {
-      database.sync().then(() => userService.addUser('test_user@example.com', 'test_user', 'test password'))
+      database.sync({force: true})
+        .then(() => userService.addUser('test_user@example.com', 'test_user', 'test password'))
         .then(() => UserModel.findAndCountAll({ where: { email: 'test_user@example.com' } }))
         .then((result) => {
           chai.expect(result.count).to.equal(1);
@@ -49,7 +54,7 @@ describe("UserService", function () {
 
 
     it("getUser should fail adding user with same login", (done) => {
-      database.sync()
+      database.sync({force: true})
         .then(() => userService.cryptPassword('test password'))
         .then((hash) =>
           UserModel.create({
@@ -70,14 +75,37 @@ describe("UserService", function () {
     let userService = null;
 
     beforeEach(() => {
-      database = new Sequelize('sqlite::memory:', { logging: null });
-      UserModel = database.import(path.join(__dirname, '..', 'models', 'UserModel'));
-      FriendsModel = database.import(path.join(__dirname, '..', 'models', 'FriendsModel'));
+      // database = new Sequelize('sqlite::memory:', { logging: null });
+      // UserModel = database.import(path.join(__dirname, '..', 'models', 'UserModel'));
+      // FriendsModel = database.import(path.join(__dirname, '..', 'models', 'FriendsModel'));
+      database = getDatabase()
+      UserModel = database['models']['user']
+      FriendsModel = database['models']['friends_relations']
       userService = new UserService(UserModel, FriendsModel);
     })
 
+    // it("Some test", (done) => {
+    //   let user = null;
+    //   let user2 = null;
+
+    //   database.sync({force: true})
+    //     .then(() => userService.addUser('asd@asd.pl', 'user1', 'user1'))
+    //     .then(() => userService.addUser('qwe@qwe.pl', 'user2', 'user2'))
+    //     .then(() => UserModel.findOne({where: {name: 'user1'}}))
+    //     .then((_user) => user = _user)
+    //     .then(() => UserModel.findOne({where: {name: 'user2'}}))
+    //     .then((_user2) => user2 = _user2)
+    //     // .then(() => console.log('USER1:\n\n', user, '\n\nUSER2:\n\n', user2))
+    //     .then(() => user.addFriend(user2, {through: {isAccepted: false}}))
+    //     // .then(() => console.log(Object.getOwnPropertyNames(UserModel)))
+    //     .then(() => FriendsModel.findOne({where: {friend: 2}}))
+    //     .then((f) => console.log(f))
+    //     .then(() => done())
+    //     .catch((err) => done(err));
+    // });
+
     it("inviteFriend should send invitation from one user to another", (done) => {
-      database.sync()
+      database.sync({force: true})
         .then(() => userService.addUser('asd@asd.pl', 'user1', 'user1'))
         .then(() => userService.addUser('qwe@qwe.pl', 'user2', 'user2'))
         .then(() => userService.inviteFriend('user1', 'user2'))
@@ -86,10 +114,14 @@ describe("UserService", function () {
 
           UserModel.findOne({where: {name: 'user1'}})
             .then((_user1) => user1 = _user1)
-            .then(() => user1.getFriend({where: {}, through: {isAccepted: false}}))
+            .then(() => user1.getFriend({where: {}, through: {where: {isAccepted: false}}}))
             .then((invited_user) => {
               chai.expect(invited_user).to.not.equal(null);
               chai.expect(invited_user[0].name).to.equal('user2');
+            })
+            .then(() => user1.getFriend({where: {}, through: {where: {isAccepted: true}}}))
+            .then((empty_list) => {
+              chai.expect(empty_list).to.be.empty;
             })
             .then((result) => done(result))
             .catch((err) => done(err));
@@ -98,7 +130,7 @@ describe("UserService", function () {
     });
 
     it("acceptInvitation should accept invitation from one user to another", (done) => {
-      database.sync()
+      database.sync({force: true})
       .then(() => userService.addUser('asd@asd.pl', 'user1', 'user1'))
       .then(() => userService.addUser('qwe@qwe.pl', 'user2', 'user2'))
       .then(() => userService.inviteFriend('user1', 'user2'))
@@ -108,7 +140,7 @@ describe("UserService", function () {
 
         UserModel.findOne({where: {name: 'user1'}})
             .then((_user) => user = _user)
-            .then(() => user.getFriend({where: {}, through: {isAccepted: true}}))
+            .then(() => user.getFriend({where: {}, through: {where: {isAccepted: true}}}))
             .then((invited_user) => {
               chai.expect(invited_user).to.not.equal(null);
               chai.expect(invited_user[0].name).to.equal('user2');
@@ -120,13 +152,17 @@ describe("UserService", function () {
     });
 
     it("getFriendsList should return list of friends for specified user", (done) => {
-      database.sync()
+      database.sync({force: true})
       .then(() => userService.addUser('asd@asd.pl', 'user1', 'user1'))
       .then(() => userService.addUser('qwe@qwe.pl', 'user2', 'user2'))
       .then(() => userService.addUser('zxc@zxc.pl', 'user3', 'user3'))
       .then(() => userService.inviteFriend('user1', 'user2'))
       .then(() => userService.acceptInvitation('user2', 'user1'))
       .then(() => userService.inviteFriend('user3', 'user2'))
+      .then(() => userService.getFriendsList('user2'))
+      .then((friendsList) => {
+        chai.expect(JSON.stringify(friendsList)).to.equal('[{"name":"user1","email":"asd@asd.pl"}]');
+      })
       .then(() => userService.acceptInvitation('user2', 'user3'))
       .then(() => userService.getFriendsList('user2'))
       .then((friendsList) => {
@@ -137,7 +173,7 @@ describe("UserService", function () {
     });
 
     it("getPendingInvitations should return list of invitations for specified user", (done) => {
-      database.sync()
+      database.sync({force: true})
       .then(() => userService.addUser('asd@asd.pl', 'user1', 'user1'))
       .then(() => userService.addUser('qwe@qwe.pl', 'user2', 'user2'))
       .then(() => userService.inviteFriend('user1', 'user2'))
@@ -145,7 +181,11 @@ describe("UserService", function () {
       .then((invitations) => {
         chai.expect(JSON.stringify(invitations)).to.equal('[{"name":"user1","email":"asd@asd.pl"}]');
       })
-      // .then(() => userService.UserModel.findOne({where: {name: 'user1'}}).then((user) => user.getFriend({logging: console.log})).then((friends) => {console.log(friends); console.log(JSON.stringify(friends));}))
+      .then(() => userService.acceptInvitation('user2', 'user1'))
+      .then(() => userService.getPendingInvitations('user2'))
+      .then((empty_list) => {
+        chai.expect(empty_list).to.be.empty;
+      })
       .then(() => done())
       .catch((err) => done(err));
     });
