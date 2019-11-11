@@ -1,4 +1,6 @@
 const Sequelize = require('sequelize');
+// var FriendsModel = require('./FriendsModel').Friends;
+// console.log(FriendsModel);
 module.exports = (sequelize, DataTypes) => {
   class User extends Sequelize.Model { }
   User.init({
@@ -26,5 +28,21 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'user'
   });
+
+  User.belongsToMany(User, {
+    as: 'friend',
+    // through: FriendsRelation,
+    through: 'friends',
+    foreignKey: 'user',
+    otherKey: 'friend'
+  });
+
+  User.belongsToMany(User, {
+    as: 'user',
+    through: 'friends',
+    foreignKey: 'friend',
+    otherKey: 'user'
+  });
+
   return User;
 };
