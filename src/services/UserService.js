@@ -184,6 +184,30 @@ class UserService {
     });
   }
 
+  getConversation(senderName, receiverName) {
+    return new Promise((resolve, reject) => {
+      let sender = null;
+      let receiver = null;
+      let resultList = [];
+
+      this.UserModel.findOne({where: {name: senderName}})
+        .then((_sender) => sender = _sender)
+        .then(() => this.UserModel.findOne({where: {name: receiverName}}))
+        .then((_receiver) => receiver = _receiver)
+        .then(() => this.FriendsModel.findOne({where: {user: sender.id, friend: receiver.id, isAccepted: true}}))
+        .then((relation) => relation.getMessages())
+        .then((messages) => resultList = resultList.concat(messages))
+        .then(() => this.FriendsModel.findOne({where: {user: receiver.id, friend: sender.id, isAccepted: true}}))
+        .then((relation) => relation.getMessages())
+        .then((messages) => resultList = resultList.concat(messages))
+        .then(() => resolve(resultList))
+        .catch((error) => {
+          log('Database error!', error.message);
+          reject('Database error!');
+        });
+    });
+  }
+
 }
 
 

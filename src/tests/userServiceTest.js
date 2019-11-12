@@ -218,6 +218,27 @@ describe("UserService", function () {
         .then(() => done())
         .catch((err) => done(err));
     });
+
+    it("getConversation should return all messages from both users", (done) => {
+      database.sync({force: true})
+        .then(() => userService.addUser('asd@asd.pl', 'user1', 'user1'))
+        .then(() => userService.addUser('qwe@qwe.pl', 'user2', 'user2'))
+        .then(() => userService.inviteFriend('user1', 'user2'))
+        .then(() => userService.acceptInvitation('user2', 'user1'))
+        .then(() => userService.sendMessage('user1', 'user2', 'Asdasdasdasd.'))
+        .then(() => userService.sendMessage('user1', 'user2', 'Qweqweqweqwe.'))
+        .then(() => userService.sendMessage('user2', 'user1', 'User2 msg.'))
+        .then(() => userService.getConversation('user1', 'user2'))
+        .then((msgList) => {
+          chai.expect(msgList).not.to.be.empty;
+          chai.expect(msgList.length).to.be.equal(3);
+          chai.expect(msgList[0].content).to.be.equal('Asdasdasdasd.');
+          chai.expect(msgList[1].content).to.be.equal('Qweqweqweqwe.');
+          chai.expect(msgList[2].content).to.be.equal('User2 msg.');
+        })
+        .then(() => done())
+        .catch((err) => done(err));
+    });
   });
 
 });
