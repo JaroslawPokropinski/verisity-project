@@ -10,16 +10,15 @@ describe("UserService", function () {
     let database = null;
     let UserModel = null;
     let FriendsModel = null;
+    let MessageModel = null;
     let userService = null;
 
     beforeEach(() => {
-      // database = new Sequelize('sqlite::memory:', { logging: null });
-      // UserModel = database.import(path.join(__dirname, '..', 'models', 'UserModel'));
-      // FriendsModel = database.import(path.join(__dirname, '..', 'models', 'FriendsModel'));
-      database = getDatabase()
-      UserModel = database['models']['user']
-      FriendsModel = database['models']['friends_relations']
-      userService = new UserService(UserModel, FriendsModel);
+      database = getDatabase();
+      UserModel = database['models']['user'];
+      FriendsModel = database['models']['friends_relations'];
+      MessageModel = database['models']['message'];
+      userService = new UserService(UserModel, FriendsModel, MessageModel);
     })
 
     it("getUser should return admin", (done) => {
@@ -72,37 +71,16 @@ describe("UserService", function () {
     let database = null;
     let UserModel = null;
     let FriendsModel = null;
+    let MessageModel = null;
     let userService = null;
 
     beforeEach(() => {
-      // database = new Sequelize('sqlite::memory:', { logging: null });
-      // UserModel = database.import(path.join(__dirname, '..', 'models', 'UserModel'));
-      // FriendsModel = database.import(path.join(__dirname, '..', 'models', 'FriendsModel'));
-      database = getDatabase()
-      UserModel = database['models']['user']
-      FriendsModel = database['models']['friends_relations']
-      userService = new UserService(UserModel, FriendsModel);
+      database = getDatabase();
+      UserModel = database['models']['user'];
+      FriendsModel = database['models']['friends_relations'];
+      MessageModel = database['models']['message'];
+      userService = new UserService(UserModel, FriendsModel, MessageModel);
     })
-
-    // it("Some test", (done) => {
-    //   let user = null;
-    //   let user2 = null;
-
-    //   database.sync({force: true})
-    //     .then(() => userService.addUser('asd@asd.pl', 'user1', 'user1'))
-    //     .then(() => userService.addUser('qwe@qwe.pl', 'user2', 'user2'))
-    //     .then(() => UserModel.findOne({where: {name: 'user1'}}))
-    //     .then((_user) => user = _user)
-    //     .then(() => UserModel.findOne({where: {name: 'user2'}}))
-    //     .then((_user2) => user2 = _user2)
-    //     // .then(() => console.log('USER1:\n\n', user, '\n\nUSER2:\n\n', user2))
-    //     .then(() => user.addFriend(user2, {through: {isAccepted: false}}))
-    //     // .then(() => console.log(Object.getOwnPropertyNames(UserModel)))
-    //     .then(() => FriendsModel.findOne({where: {friend: 2}}))
-    //     .then((f) => console.log(f))
-    //     .then(() => done())
-    //     .catch((err) => done(err));
-    // });
 
     it("inviteFriend should send invitation from one user to another", (done) => {
       database.sync({force: true})
@@ -190,4 +168,56 @@ describe("UserService", function () {
       .catch((err) => done(err));
     });
   });
+
+  describe("messages", function () {
+    let database = null;
+    let UserModel = null;
+    let FriendsModel = null;
+    let MessageModel = null;
+    let userService = null;
+
+    beforeEach(() => {
+      database = getDatabase();
+      UserModel = database['models']['user'];
+      FriendsModel = database['models']['friends_relations'];
+      MessageModel = database['models']['message'];
+      userService = new UserService(UserModel, FriendsModel, MessageModel);
+    })
+
+    it("sendMessage should send text message", (done) => {
+      database.sync({force: true})
+        .then(() => userService.addUser('asd@asd.pl', 'user1', 'user1'))
+        .then(() => userService.addUser('qwe@qwe.pl', 'user2', 'user2'))
+        .then(() => userService.inviteFriend('user1', 'user2'))
+        .then(() => userService.acceptInvitation('user2', 'user1'))
+        .then(() => userService.sendMessage('user1', 'user2', 'Asdasdasdasd.'))
+        .then(() => userService.MessageModel.findOne({where: {id: 1}}))
+        .then((msg) => {
+          chai.expect(msg).not.to.be.null;
+          chai.expect(msg.content).to.be.equal('Asdasdasdasd.');
+        })
+        .then(() => done())
+        .catch((err) => done(err));
+    });
+
+    it("getMessages should return all messages sent by one user to another", (done) => {
+      database.sync({force: true})
+        .then(() => userService.addUser('asd@asd.pl', 'user1', 'user1'))
+        .then(() => userService.addUser('qwe@qwe.pl', 'user2', 'user2'))
+        .then(() => userService.inviteFriend('user1', 'user2'))
+        .then(() => userService.acceptInvitation('user2', 'user1'))
+        .then(() => userService.sendMessage('user1', 'user2', 'Asdasdasdasd.'))
+        .then(() => userService.sendMessage('user1', 'user2', 'Qweqweqweqwe.'))
+        .then(() => userService.getMessages('user1', 'user2'))
+        .then((msgList) => {
+          chai.expect(msgList).not.to.be.empty;
+          chai.expect(msgList.length).to.be.equal(2);
+          chai.expect(msgList[0].content).to.be.equal('Asdasdasdasd.');
+          chai.expect(msgList[1].content).to.be.equal('Qweqweqweqwe.');
+        })
+        .then(() => done())
+        .catch((err) => done(err));
+    });
+  });
+
 });
