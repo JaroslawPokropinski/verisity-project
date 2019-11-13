@@ -98,6 +98,12 @@ module.exports = (userService) => {
   });
 
   // get friends list
+  /**
+   * @swagger
+   * /friends:
+   *   get:
+   *     summary: Get list of friends for authenticated user, if not authenticated - response.code = 401
+   */
   router.get('/friends', (req, res) => {
     if (req.session.userInfo) {
       const user = req.session.userInfo.name;
@@ -117,6 +123,12 @@ module.exports = (userService) => {
   }
 
   // invite friend
+  /**
+   * @swagger
+   * /friends:
+   *   post:
+   *     summary: Invite new friend, if not authenticated - response.code = 401
+   */
   router.post('/friends', celebrate(addFriendSchema), (req, res) => {
     if (req.session.userInfo) {
       const {username} = req.body;
@@ -130,6 +142,12 @@ module.exports = (userService) => {
   });
 
   // get pending invitations
+  /**
+   * @swagger
+   * /friends/invitations:
+   *   get:
+   *     summary: Get pending invitations for authenticated user, if not authenticated - response.code = 401
+   */
   router.get('/friends/invitations', (req, res) => {
     if (req.session.userInfo) {
       const user = req.session.userInfo.name;
@@ -142,6 +160,12 @@ module.exports = (userService) => {
   })
 
   // accept invitation
+  /**
+   * @swagger
+   * /friends/invitations:
+   *   post:
+   *     summary: Accept pending invitation, if not authenticated - response.code = 401
+   */
   router.post('/friends/invitations', celebrate(addFriendSchema), (req, res) => {
     if (req.session.userInfo) {
       const {username} = req.body;
