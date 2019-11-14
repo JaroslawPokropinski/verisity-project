@@ -24,7 +24,8 @@ const sessionConfig = getSessionConfig(session, database);
 // Setup database models
 const UserModel = database['models']['user'];
 const FriendsModel = database['models']['friends_relations'];
-const userService = new UserService(UserModel, FriendsModel);
+const MessageModel = database['models']['message'];
+const userService = new UserService(UserModel, FriendsModel, MessageModel);
 app.use(session(sessionConfig));
 
 // Create tables in database and add admin admin
