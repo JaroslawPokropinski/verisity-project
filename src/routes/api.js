@@ -177,6 +177,51 @@ module.exports = (userService) => {
       res.status(401).send();
     }
   })
+  
+  // get all messages between users
+  /**
+   * @swagger
+   * /friends/:name:
+   *   get:
+   *     summary: Get messages sent and recieved from user(:name param), if not authenticated - response.code = 401
+   */
+  router.get('/friends/:name', (req, res) => {
+    if (req.session.userInfo) {
+      const username = req.params.name;
+      const user = req.session.userInfo.name;
+      userService.getConversation(user, username)
+      .then((messages) => res.send(messages))
+      .catch((error) => res.status(400).send(error));
+    } else {
+      res.status(401).send();
+    }
+  })
+  
+  const sendMessageSchema = {
+    body: {
+      message: Joi.string().min(1).max(500).required()
+    }
+  }
+
+  // send message
+  /**
+   * @swagger
+   * /friends/:name:
+   *   post:
+   *     summary: Send message to user, which name is specified in :name param, if not authenticated - response.code = 401
+   */
+  router.post('/friends/:name', celebrate(sendMessageSchema), (req, res) => {
+    if (req.session.userInfo) {
+      const username = req.params.name;
+      const user = req.session.userInfo.name;
+      const {message} = req.body;
+      userService.sendMessage(user, username, message)
+        .then((result) => res.send(result))
+        .catch((error) => res.status(400).send(error));
+    } else {
+      res.status(401).send();
+    }
+  })
 
 
   router.use(errors());

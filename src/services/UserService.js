@@ -153,12 +153,19 @@ class UserService {
         .then((_receiver) => receiver = _receiver)
         .then(() => this.FriendsModel.findOne({where: {user: sender.id, friend: receiver.id}}))
         .then((_relation) => relation = _relation)
+        .then(() => {
+          if (relation === null) {
+            log(`You are not friend with user ${receiverName}`);
+            reject({"error": `You are not friend with user ${receiverName}`});
+          }
+        })
         .then(() => this.MessageModel.create({content: msgContent}))
         .then((msg) => msg.setFriends_relation(relation)) // TODO: change friends table name
         .then((result) => resolve(result))
         .catch((error) => {
           log('Database error!', error.message);
           reject('Database error!');
+          // reject(error.message);
         });
     });
   }
@@ -176,7 +183,11 @@ class UserService {
         .then(() => this.FriendsModel.findOne({where: {user: sender.id, friend: receiver.id, isAccepted: true}}))
         .then((rel) => relation = rel)
         .then(() => relation.getMessages())
-        .then((messages) => resolve(messages))
+        .then((messages) => {
+          var msg = messages.map(msg => msg.toJSON());
+          msg.map(i => i.author = senderName);
+          resolve(msg);
+        })
         .catch((error) => {
           log('Database error!', error.message);
           reject('Database error!');
@@ -196,10 +207,18 @@ class UserService {
         .then((_receiver) => receiver = _receiver)
         .then(() => this.FriendsModel.findOne({where: {user: sender.id, friend: receiver.id, isAccepted: true}}))
         .then((relation) => relation.getMessages())
-        .then((messages) => resultList = resultList.concat(messages))
+        .then((messages) => messages.map(msg => msg.toJSON()))
+        .then((messages) => {
+          messages.map(msg => msg.author = senderName);
+          resultList = resultList.concat(messages);
+        })
         .then(() => this.FriendsModel.findOne({where: {user: receiver.id, friend: sender.id, isAccepted: true}}))
         .then((relation) => relation.getMessages())
-        .then((messages) => resultList = resultList.concat(messages))
+        .then((messages) => messages.map(msg => msg.toJSON()))
+        .then((messages) => {
+          messages.map(msg => msg.author = receiverName);
+          resultList = resultList.concat(messages);
+        })
         .then(() => resolve(resultList))
         .catch((error) => {
           log('Database error!', error.message);
