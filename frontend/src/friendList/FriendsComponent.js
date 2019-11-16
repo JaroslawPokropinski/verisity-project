@@ -8,15 +8,25 @@ class FriendsComponent extends React.Component {
     constructor({ allUsers, onFriendClick, onFriendCall }) {
       super(allUsers, onFriendClick, onFriendCall);
       this.state = {
+        allUsers,
         filteredUsers: allUsers
       };
   
       this.filter = this.filter.bind(this);
     }
+
+    componentDidMount() {
+      fetch('http://localhost:9000/api/friends')
+        .then((res) => res.json())
+        .then((response) => this.setState({ 
+          allUsers: response.users,
+          filteredUsers: response.users
+        }));
+    }
   
     getFilteredUsers(text) {
-      return this.props.allUsers.filter(
-        (user) => user.toLowerCase().includes(text.toLowerCase())
+      return this.state.allUsers.filter(
+        (user) => user.name.toLowerCase().includes(text.toLowerCase())
       );
     }
   

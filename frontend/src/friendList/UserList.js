@@ -11,8 +11,8 @@ function UsersList({ users, onFriendClick, onFriendCall }) {
         <div>
           {users.map((user) => (
             <User 
-              key={user} 
-              name={user} 
+              key={user.id} 
+              name={user.name} 
               onFriendClick={onFriendClick}
               onFriendCall={onFriendCall}
             />
