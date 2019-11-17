@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 
 import Content from './Content';
+import FriendsComponent from './friendList/FriendsComponent';
 
 const RootContainer = styled.div`
   display: flex;
@@ -16,7 +17,12 @@ const ConnectContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
-const FriendList = styled.div``;
+
+// ===== mock for FriendList =====
+const onFriendClick = (email) => alert(`Typing to friend ${email}!`);
+const onFriendCall = (email) => alert(`Calling to friend ${email}!`);
+// ===== end mock for FriendList =====
+
 
 const getDevices = () => new Promise((resolve) => {
   if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
@@ -153,7 +159,10 @@ class Root extends React.Component {
           <input type="submit" value="Connect" onClick={this.onClick} />
         </ConnectContainer>
 
-        <FriendList />
+        <FriendsComponent
+          onFriendClick={onFriendClick}
+          onFriendCall={onFriendCall}
+        />
         <Content selected={null} />
         {/* <Chat onVideo={this.onVideo} /> */}
       </RootContainer>
