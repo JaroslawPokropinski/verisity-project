@@ -14,6 +14,7 @@ class UserService {
    */
   constructor(UserModel) {
     this.UserModel = UserModel;
+    this.peers = new Map();
     log(JSON.stringify(UserModel));
   }
 
@@ -66,6 +67,18 @@ class UserService {
         .then((user) => resolve(user))
         .catch((error) => reject(error));
     });
+  }
+
+  setPeerId(name, id) {
+    this.peers.set(name, id);
+  }
+
+  getPeerId(name) {
+    return this.peers.get(name);
+  }
+
+  dismissPeerId(name) {
+    this.peers.delete(name);
   }
 }
 

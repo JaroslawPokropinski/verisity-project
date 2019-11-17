@@ -11,7 +11,7 @@ import Login from './Login';
 import Root from './Root';
 import Register from './Register';
 import axios from './axios';
-import Peer from './peerjs';
+import Peer from './helpers/peerjs';
 import { setPeer, setSession } from './actions/sessionActions';
 
 

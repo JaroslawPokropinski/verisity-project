@@ -18,7 +18,7 @@ class MyPeer extends Peer {
         port: 9000,
         secure: false,
         key: 'peerjs',
-        debug: 3
+        debug: 0
       });
     }
   }
