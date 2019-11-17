@@ -131,7 +131,7 @@ module.exports = (userService) => {
    */
   router.post('/friends', celebrate(addFriendSchema), (req, res) => {
     if (req.session.userInfo) {
-      const {username} = req.body;
+      const { username } = req.body;
       const user = req.session.userInfo.name;
       userService.inviteFriend(user, username)
         .then((result) => res.send(result))
@@ -168,7 +168,7 @@ module.exports = (userService) => {
    */
   router.post('/friends/invitations', celebrate(addFriendSchema), (req, res) => {
     if (req.session.userInfo) {
-      const {username} = req.body;
+      const { username } = req.body;
       const user = req.session.userInfo.name;
       userService.acceptInvitation(user, username)
         .then((result) => res.send(result))
@@ -177,7 +177,7 @@ module.exports = (userService) => {
       res.status(401).send();
     }
   })
-  
+
   // get all messages between users
   /**
    * @swagger
@@ -190,13 +190,13 @@ module.exports = (userService) => {
       const username = req.params.name;
       const user = req.session.userInfo.name;
       userService.getConversation(user, username)
-      .then((messages) => res.send(messages))
-      .catch((error) => res.status(400).send(error));
+        .then((messages) => res.send(messages))
+        .catch((error) => res.status(400).send(error));
     } else {
       res.status(401).send();
     }
   })
-  
+
   const sendMessageSchema = {
     body: {
       message: Joi.string().min(1).max(500).required()
@@ -214,7 +214,7 @@ module.exports = (userService) => {
     if (req.session.userInfo) {
       const username = req.params.name;
       const user = req.session.userInfo.name;
-      const {message} = req.body;
+      const { message } = req.body;
       userService.sendMessage(user, username, message)
         .then((result) => res.send(result))
         .catch((error) => res.status(400).send(error));
@@ -222,6 +222,38 @@ module.exports = (userService) => {
       res.status(401).send();
     }
   })
+
+  const peerSchema = {
+    body: {
+      id: Joi.string().required(),
+    }
+  }
+
+  router.post('/peer', celebrate(peerSchema), (req, res) => {
+    if (req.session.userInfo) {
+      userService.setPeerId(req.session.userInfo.email, req.body.id);
+      res.send();
+    } else {
+      res.status(401).send();
+    }
+  });
+
+  router.get('/peer', (req, res) => {
+    if (req.session.userInfo) {
+      if (!req.query.email) {
+        return res.status(400).send();
+      }
+
+      const id = userService.getPeerId(req.query.email);
+      if (id) {
+        res.send(id);
+      } else {
+        res.status(404).send('User is not connected!');
+      }
+    } else {
+      res.status(401).send();
+    }
+  });
 
 
   router.use(errors());

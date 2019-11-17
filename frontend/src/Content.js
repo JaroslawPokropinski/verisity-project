@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import VideoChat from './components/VideoChat';
 
 const ContentContainer = styled.div`
   height: 100%;
@@ -31,43 +32,50 @@ const NoneSelected = () => (
 );
 
 const ConditionalContent = (props) => {
-  const { selected } = props;
+  const { selected, onCall, onVideo } = props;
   if (selected) {
-    return <SubContainer><Chat /></SubContainer>;
+    return (
+      <SubContainer>
+        <VideoChat onCall={onCall} onVideo={onVideo} />
+        <Chat />
+      </SubContainer>
+    );
   }
   return <SubContainer><NoneSelected /></SubContainer>;
 };
 
 ConditionalContent.propTypes = {
-  selected: PropTypes.instanceOf(Object)
+  selected: PropTypes.instanceOf(Object),
+  onCall: PropTypes.instanceOf(Object),
+  onVideo: PropTypes.func.isRequired,
 };
 
 ConditionalContent.defaultProps = {
-  selected: null
+  selected: null,
+  onCall: null,
 };
 
+// eslint-disable-next-line react/prefer-stateless-function
 class Content extends React.Component {
-  constructor() {
-    super();
-    this.videoRef = React.createRef();
-  }
-
   render() {
-    const { selected } = this.props;
+    const { selected, onCall, onVideo } = this.props;
     return (
       <ContentContainer>
-        <ConditionalContent selected={selected} />
+        <ConditionalContent selected={selected} onCall={onCall} onVideo={onVideo} />
       </ContentContainer>
     );
   }
 }
 
 Content.propTypes = {
-  selected: PropTypes.instanceOf(Object)
+  selected: PropTypes.instanceOf(Object),
+  onCall: PropTypes.instanceOf(Object),
+  onVideo: PropTypes.func.isRequired,
 };
 
 Content.defaultProps = {
-  selected: null
+  selected: null,
+  onCall: null,
 };
 
 export default Content;
