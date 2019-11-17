@@ -15,18 +15,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 
   background-color: var(--background-color);
-  font-family: 'Montserrat', sans-serif;
 }
 
-* {
-  font-family: 'Montserrat', sans-serif;
-}
 html {
   height: 100vh;
-}
-
-.FriendListComponent {
-  width: 400px;
 }
 
 .phone_icon {

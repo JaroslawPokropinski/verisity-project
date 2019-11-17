@@ -7,8 +7,9 @@ const Container = styled.div``;
 
 const Video = styled.video`
   background-color: white;
-  min-width: 400px;
-  min-height: 400px; 
+  min-width: 200px;
+  min-height: 200px; 
+  max-width: 100%;
 `;
 
 export default class VideoChat extends React.Component {

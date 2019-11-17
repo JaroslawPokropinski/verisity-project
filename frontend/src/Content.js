@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
 import VideoChat from './components/VideoChat';
 
 const ContentContainer = styled.div`
@@ -8,18 +9,20 @@ const ContentContainer = styled.div`
   width: 100%;
   box-sizing: border-box;
   padding: 8px;
+  display: flex;
+  flex-direction: column;
 `;
 
 const SubContainer = styled.div`
-  height: 100%;
   width: 100%;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-content: center;
   text-align: center;
   border-radius: 4px;
-  background-color: var(--primary-color);
+  /* background-color: var(--primary-color); */
   text-align: center;
 `;
 
@@ -41,7 +44,11 @@ const ConditionalContent = (props) => {
       </SubContainer>
     );
   }
-  return <SubContainer><NoneSelected /></SubContainer>;
+  return (
+    <SubContainer>
+      <NoneSelected />
+    </SubContainer>
+  );
 };
 
 ConditionalContent.propTypes = {
@@ -55,12 +62,19 @@ ConditionalContent.defaultProps = {
   onCall: null,
 };
 
+const styles = (theme) => ({
+  toolbar: theme.mixins.toolbar,
+});
+
 // eslint-disable-next-line react/prefer-stateless-function
 class Content extends React.Component {
   render() {
-    const { selected, onCall, onVideo } = this.props;
+    const {
+      selected, onCall, onVideo, classes
+    } = this.props;
     return (
       <ContentContainer>
+        <div className={classes.toolbar} />
         <ConditionalContent selected={selected} onCall={onCall} onVideo={onVideo} />
       </ContentContainer>
     );
@@ -68,6 +82,7 @@ class Content extends React.Component {
 }
 
 Content.propTypes = {
+  classes: PropTypes.instanceOf(Object).isRequired,
   selected: PropTypes.instanceOf(Object),
   onCall: PropTypes.instanceOf(Object),
   onVideo: PropTypes.func.isRequired,
@@ -78,4 +93,4 @@ Content.defaultProps = {
   onCall: null,
 };
 
-export default Content;
+export default withStyles(styles)(Content);

@@ -1,24 +1,29 @@
 import React from 'react';
-import styled from 'styled-components';
+import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 
+import { CssBaseline } from '@material-ui/core';
+import AppBar from './components/AppBar';
+
 import Content from './Content';
 import Media from './helpers/media';
 import FriendsComponent from './friendList/FriendsComponent';
 import axios from './axios';
+import Drawer from './components/Drawer';
 
-const RootContainer = styled.div`
-  display: flex;
-  height: 100vh;
-`;
-
-const ConnectContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
+const styles = (theme) => ({
+  root: {
+    display: 'flex',
+    height: '100vh',
+  },
+  content: {
+    flexGrow: 1,
+    padding: theme.spacing(3),
+  },
+});
 
 // ===== mock for FriendList =====
 const onFriendClick = (email) => alert(`Typing to friend ${email}!`);
@@ -28,7 +33,7 @@ const onFriendClick = (email) => alert(`Typing to friend ${email}!`);
 class Root extends React.Component {
   constructor() {
     super();
-    this.state = { /* friends: null */ input: '', call: null };
+    this.state = { /* friends: null */ input: '', call: null, mobileOpen: false };
     this.mediastream = null;
     this.videoRef = null;
     this.devices = { audio: false, video: false };
@@ -80,7 +85,6 @@ class Root extends React.Component {
               this.videoRef.current.play();
             }
           });
-          console.log(call);
           this.setState({ call: { peer: call.peer } });
         })
         .catch((error) => {
@@ -101,7 +105,6 @@ class Root extends React.Component {
 
   // on button 'call friend' pressed
   onCall(id) {
-    console.log(id);
     // call server for 'to' id
     const { session } = this.props;
     const { peer } = session;
@@ -135,24 +138,35 @@ class Root extends React.Component {
     this.onCall(input);
   }
 
+  onMobileOpen() {
+    const { mobileOpen } = this.state;
+    this.setState({ mobileOpen: !mobileOpen });
+  }
+
   render() {
-    const { call } = this.state;
+    const { classes } = this.props;
+    const { call, mobileOpen } = this.state;
 
     return (
-      <RootContainer>
-        <FriendsComponent
-          onFriendClick={onFriendClick}
-          onFriendCall={this.onFriendCall}
-        />
-        <Content selected={call} onCall={call} onVideo={this.onVideo} />
+      <div className={classes.root}>
+        <CssBaseline />
+        <AppBar handleDrawerToggle={this.onMobileOpen} />
+        <Drawer handleDrawerToggle={this.onMobileOpen} mobileOpen={mobileOpen}>
+          <FriendsComponent
+            onFriendClick={onFriendClick}
+            onFriendCall={this.onFriendCall}
+          />
+        </Drawer>
+        <Content className={classes.content} selected={call} onCall={call} onVideo={this.onVideo} />
 
         {/* <Chat onVideo={this.onVideo} /> */}
-      </RootContainer>
+      </div>
     );
   }
 }
 
 Root.propTypes = {
+  classes: PropTypes.instanceOf(Object).isRequired,
   history: PropTypes.instanceOf(Object).isRequired,
   session: PropTypes.instanceOf(Object).isRequired,
 };
@@ -163,4 +177,4 @@ const mapStateToProps = (state) => ({
 
 const containerRoot = connect(mapStateToProps)(Root);
 
-export default containerRoot;
+export default withStyles(styles)(containerRoot);
