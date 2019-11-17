@@ -92,14 +92,14 @@ class UserService {
   }
 
   //FriendsRelation function
-  getFriendsList(userName) {
+  getFriendsList(userEmail) {
     return new Promise((resolve, reject) => {
       let user = null;
 
-      this.UserModel.findOne({ where: { name: userName } })
+      this.UserModel.findOne({ where: { email: userEmail } })
         .then((_user) => {
           if (_user === null) {
-            reject({ errorMessage: `There is no user with name = ${userName} in database!` });
+            reject({ errorMessage: `There is no user with email = ${userEmail} in database!` });
           }
           user = _user;
         })
@@ -112,14 +112,14 @@ class UserService {
     });
   }
 
-  getPendingInvitations(userName) {
+  getPendingInvitations(userEmail) {
     return new Promise((resolve, reject) => {
       let user = null;
 
-      this.UserModel.findOne({ where: { name: userName } })
+      this.UserModel.findOne({ where: { email: userEmail } })
         .then((_user) => {
           if (_user === null) {
-            reject({ errorMessage: `There is no user with name = ${userName} in database!` });
+            reject({ errorMessage: `There is no user with email = ${userEmail} in database!` });
           }
           user = _user;
         })
@@ -131,23 +131,23 @@ class UserService {
         });
     });
   }
-
-  inviteFriend(userName, userToInviteName) {
+  
+  inviteFriend(userEmail, userToInviteEmail) {
     return new Promise((resolve, reject) => {
       let userToInvite = null;
       let user = null;
 
-      this.UserModel.findOne({ where: { name: userToInviteName } })
+      this.UserModel.findOne({ where: { email: userToInviteEmail } })
         .then((_userToInvite) => {
           if (_userToInvite === null) {
-            reject({ errorMessage: `There is no user with name = ${userToInviteName} in database!` });
+            reject({ errorMessage: `There is no user with email = ${userToInviteEmail} in database!` });
           }
           userToInvite = _userToInvite;
         })
-        .then(() => this.UserModel.findOne({ where: { name: userName } }))
+        .then(() => this.UserModel.findOne({where: {email: userEmail}}))
         .then((_user) => {
           if (_user === null) {
-            reject({ errorMessage: `There is no user with name = ${userName} in database!` });
+            reject({ errorMessage: `There is no user with email = ${userEmail} in database!` });
           }
           user = _user;
         })
@@ -160,30 +160,30 @@ class UserService {
     });
   }
 
-  acceptInvitation(userName, userToAcceptName) {
+  acceptInvitation(userEmail, userToAcceptEmail) {
     return new Promise((resolve, reject) => {
       let userToAccept = null;
       let user = null;
 
-      this.UserModel.findOne({ where: { name: userToAcceptName } })
+      this.UserModel.findOne({ where: { email: userToAcceptEmail } })
         .then((_userToAccept) => {
           if (_userToAccept === null) {
-            reject({ errorMessage: `There is no user with name = ${userToAcceptName} in database!` });
+            reject({ errorMessage: `There is no user with email = ${userToAcceptEmail} in database!` });
           }
           userToAccept = _userToAccept;
         })
-        .then(() => this.UserModel.findOne({ where: { name: userName } }))
+        .then(() => this.UserModel.findOne({ where: { email: userEmail } }))
         .then((_user) => {
           if (_user === null) {
-            reject({ errorMessage: `There is no user with name = ${userName} in database!` });
+            reject({ errorMessage: `There is no user with email = ${userEmail} in database!` });
           }
           user = _user;
         })
         .then(() => this.FriendsModel.findOne({ where: { user: userToAccept.id, friend: user.id, isAccepted: false } }))
         .then((relation) => {
           if (relation === null) {
-            log(`Users are friends already, or there is no invitation from user ${userToAcceptName} to user ${userName}!`);
-            reject({ errorMessage: `Users are friends already, or there is no invitation from user ${userToAcceptName} to user ${userName}!` });
+            log(`Users are friends already, or there is no invitation from user ${userToAcceptEmail} to user ${userEmail}!`);
+            reject({ errorMessage: `Users are friends already, or there is no invitation from user ${userToAcceptEmail} to user ${userEmail}!` });
           }
           relation.isAccepted = true;
           relation.save();
@@ -198,31 +198,31 @@ class UserService {
   }
 
   // Message functions
-  sendMessage(senderName, receiverName, msgContent) {
+  sendMessage(senderEmail, receiverEmail, msgContent) {
     return new Promise((resolve, reject) => {
       let sender = null;
       let receiver = null;
       let relation = null;
 
-      this.UserModel.findOne({ where: { name: senderName } })
+      this.UserModel.findOne({ where: { email: senderEmail } })
         .then((_sender) => {
           if (_sender === null) {
-            reject({ errorMessage: `There is no user with name = ${senderName} in database!` });
+            reject({ errorMessage: `There is no user with email = ${senderEmail} in database!` });
           }
           sender = _sender;
         })
-        .then(() => this.UserModel.findOne({ where: { name: receiverName } }))
+        .then(() => this.UserModel.findOne({ where: { email: receiverEmail } }))
         .then((_receiver) => {
           if (_receiver === null) {
-            reject({ errorMessage: `There is no user with name = ${receiverName} in database!` });
+            reject({ errorMessage: `There is no user with email = ${receiverEmail} in database!` });
           }
           receiver = _receiver;
         })
         .then(() => this.FriendsModel.findOne({ where: { user: sender.id, friend: receiver.id } }))
         .then((_relation) => {
           if (_relation === null || _relation.isAccepted == false) {
-            log(`You are not friend with user ${receiverName}!`);
-            reject({ errorMessage: `You are not friend with user ${receiverName}!` });
+            log(`You are not friend with user ${receiverEmail}!`);
+            reject({ errorMessage: `You are not friend with user ${receiverEmail}!` });
           }
           relation = _relation;
         })
@@ -237,37 +237,37 @@ class UserService {
     });
   }
 
-  getMessages(senderName, receiverName) {
+  getMessages(senderEmail, receiverEmail) {
     return new Promise((resolve, reject) => {
       let sender = null;
       let receiver = null;
       let relation = null;
 
-      this.UserModel.findOne({ where: { name: senderName } })
+      this.UserModel.findOne({ where: { email: senderEmail } })
         .then((_sender) => {
           if (_sender === null) {
-            reject({ errorMessage: `There is no user with name = ${senderName} in database!` });
+            reject({ errorMessage: `There is no user with email = ${senderEmail} in database!` });
           }
           sender = _sender;
         })
-        .then(() => this.UserModel.findOne({ where: { name: receiverName } }))
+        .then(() => this.UserModel.findOne({ where: { email: receiverEmail } }))
         .then((_receiver) => {
           if (_receiver === null) {
-            reject({ errorMessage: `There is no user with name = ${receiverName} in database!` });
+            reject({ errorMessage: `There is no user with email = ${receiverEmail} in database!` });
           }
           receiver = _receiver;
         })
         .then(() => this.FriendsModel.findOne({ where: { user: sender.id, friend: receiver.id, isAccepted: true } }))
         .then((rel) => {
           if (rel === null) {
-            reject({ errorMessage: `You are not friend with user ${receiverName}!` });
+            reject({ errorMessage: `You are not friend with user ${receiverEmail}!` });
           }
           relation = rel;
         })
         .then(() => relation.getMessages())
         .then((messages) => {
           var msg = messages.map(msg => msg.toJSON());
-          msg.map(i => i.author = senderName);
+          msg.map(i => i.author = sender.name);
           resolve(msg);
         })
         .catch((error) => {
@@ -277,51 +277,51 @@ class UserService {
     });
   }
 
-  getConversation(senderName, receiverName) {
+  getConversation(senderEmail, receiverEmail) {
     return new Promise((resolve, reject) => {
       let sender = null;
       let receiver = null;
       let resultList = [];
       let relation = null;
 
-      this.UserModel.findOne({ where: { name: senderName } })
+      this.UserModel.findOne({ where: { email: senderEmail } })
         .then((_sender) => {
           if (_sender === null) {
-            reject({ errorMessage: `There is no user with name = ${senderName} in database!` });
+            reject({ errorMessage: `There is no user with email = ${senderEmail} in database!` });
           }
           sender = _sender;
         })
-        .then(() => this.UserModel.findOne({ where: { name: receiverName } }))
+        .then(() => this.UserModel.findOne({ where: { email: receiverEmail } }))
         .then((_receiver) => {
           if (_receiver === null) {
-            reject({ errorMessage: `There is no user with name = ${receiverName} in database!` });
+            reject({ errorMessage: `There is no user with email = ${receiverEmail} in database!` });
           }
           receiver = _receiver;
         })
         .then(() => this.FriendsModel.findOne({ where: { user: sender.id, friend: receiver.id, isAccepted: true } }))
         .then((_relation) => {
           if (_relation === null) {
-            reject({ errorMessage: `You are not friend with user ${receiverName}!` });
+            reject({ errorMessage: `You are not friend with user ${receiverEmail}!` });
           }
           relation = _relation;
         })
         .then(() => relation.getMessages())
         .then((messages) => messages.map(msg => msg.toJSON()))
         .then((messages) => {
-          messages.map(msg => msg.author = senderName);
+          messages.map(msg => msg.author = sender.name);
           resultList = resultList.concat(messages);
         })
         .then(() => this.FriendsModel.findOne({ where: { user: receiver.id, friend: sender.id, isAccepted: true } }))
         .then((_relation) => {
           if (_relation === null) {
-            reject({ errorMessage: `You are not friend with user ${receiverName}!` });
+            reject({ errorMessage: `You are not friend with user ${receiverEmail}!` });
           }
           relation = _relation;
         })
         .then(() => relation.getMessages())
         .then((messages) => messages.map(msg => msg.toJSON()))
         .then((messages) => {
-          messages.map(msg => msg.author = receiverName);
+          messages.map(msg => msg.author = receiver.name);
           resultList = resultList.concat(messages);
         })
         .then(() => resolve(resultList))
