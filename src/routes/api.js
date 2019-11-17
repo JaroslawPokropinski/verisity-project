@@ -97,6 +97,133 @@ module.exports = (userService) => {
       .catch((error) => res.status(400).send(error));
   });
 
+  // get friends list
+  /**
+   * @swagger
+   * /friends:
+   *   get:
+   *     summary: Get list of friends for authenticated user, if not authenticated - response.code = 401
+   */
+  router.get('/friends', (req, res) => {
+    if (req.session.userInfo) {
+      const user = req.session.userInfo.name;
+      userService.getFriendsList(user)
+        .then((friendsList) => res.send(friendsList))
+        .catch((error) => res.status(500).send(error));
+    } else {
+      res.status(401).send();
+    }
+
+  });
+
+  const addFriendSchema = {
+    body: {
+      username: Joi.string().required()
+    }
+  }
+
+  // invite friend
+  /**
+   * @swagger
+   * /friends:
+   *   post:
+   *     summary: Invite new friend, if not authenticated - response.code = 401
+   */
+  router.post('/friends', celebrate(addFriendSchema), (req, res) => {
+    if (req.session.userInfo) {
+      const {username} = req.body;
+      const user = req.session.userInfo.name;
+      userService.inviteFriend(user, username)
+        .then((result) => res.send(result))
+        .catch((error) => res.status(400).send(error));
+    } else {
+      res.status(401).send();
+    }
+  });
+
+  // get pending invitations
+  /**
+   * @swagger
+   * /friends/invitations:
+   *   get:
+   *     summary: Get pending invitations for authenticated user, if not authenticated - response.code = 401
+   */
+  router.get('/friends/invitations', (req, res) => {
+    if (req.session.userInfo) {
+      const user = req.session.userInfo.name;
+      userService.getPendingInvitations(user)
+        .then((invitations) => res.send(invitations))
+        .catch((error) => res.status(500).send(error));
+    } else {
+      res.status(401).send();
+    }
+  })
+
+  // accept invitation
+  /**
+   * @swagger
+   * /friends/invitations:
+   *   post:
+   *     summary: Accept pending invitation, if not authenticated - response.code = 401
+   */
+  router.post('/friends/invitations', celebrate(addFriendSchema), (req, res) => {
+    if (req.session.userInfo) {
+      const {username} = req.body;
+      const user = req.session.userInfo.name;
+      userService.acceptInvitation(user, username)
+        .then((result) => res.send(result))
+        .catch((error) => res.status(400).send(error));
+    } else {
+      res.status(401).send();
+    }
+  })
+  
+  // get all messages between users
+  /**
+   * @swagger
+   * /friends/:name:
+   *   get:
+   *     summary: Get messages sent and recieved from user(:name param), if not authenticated - response.code = 401
+   */
+  router.get('/friends/:name', (req, res) => {
+    if (req.session.userInfo) {
+      const username = req.params.name;
+      const user = req.session.userInfo.name;
+      userService.getConversation(user, username)
+      .then((messages) => res.send(messages))
+      .catch((error) => res.status(400).send(error));
+    } else {
+      res.status(401).send();
+    }
+  })
+  
+  const sendMessageSchema = {
+    body: {
+      message: Joi.string().min(1).max(500).required()
+    }
+  }
+
+  // send message
+  /**
+   * @swagger
+   * /friends/:name:
+   *   post:
+   *     summary: Send message to user, which name is specified in :name param, if not authenticated - response.code = 401
+   */
+  router.post('/friends/:name', celebrate(sendMessageSchema), (req, res) => {
+    if (req.session.userInfo) {
+      const username = req.params.name;
+      const user = req.session.userInfo.name;
+      const {message} = req.body;
+      userService.sendMessage(user, username, message)
+        .then((result) => res.send(result))
+        .catch((error) => res.status(400).send(error));
+    } else {
+      res.status(401).send();
+    }
+  })
+
+
   router.use(errors());
   return router;
 }
