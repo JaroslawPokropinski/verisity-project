@@ -22,20 +22,17 @@ app.use(bodyParser.json());
 const database = getDatabase();
 const sessionConfig = getSessionConfig(session, database);
 // Setup database models
-const UserModel = database.import(path.join(__dirname, 'models', 'UserModel'));
-const userService = new UserService(UserModel);
+const UserModel = database['models']['user'];
+const FriendsModel = database['models']['friends_relations'];
+const MessageModel = database['models']['message'];
+const userService = new UserService(UserModel, FriendsModel, MessageModel);
 app.use(session(sessionConfig));
 
-// Create tables in database and add admin admin
 database.sync({ force: true })
-  .then(() => userService.cryptPassword('adminadmin'))
-  .then((hash) => {
-    UserModel.create({
-      email: 'admin@example.com',
-      name: 'admin',
-      hash_password: hash,
-    })
-  });
+  .then(() => userService.addUser('admin@example.com', 'admin', 'adminadmin'))
+  .then(() => userService.addUser('admin2@example.com', 'admin2', 'adminadmin'))
+  .then(() => userService.inviteFriend('admin', 'admin2'))
+  .then(() => userService.acceptInvitation('admin2', 'admin'))
 
 // Setup controllers
 app.use('/api', api(userService));
@@ -58,6 +55,7 @@ app.server.on('connection', (client) => {
 
 app.server.on('disconnect', (client) => {
   log(`${client.id} disconnected!`);
+  userService.dismissPeerId(client.id);
 });
 
 module.exports = app;

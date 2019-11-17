@@ -7,6 +7,8 @@ import { toast } from 'react-toastify';
 
 import Content from './Content';
 import Media from './helpers/media';
+import FriendsComponent from './friendList/FriendsComponent';
+import axios from './axios';
 
 const RootContainer = styled.div`
   display: flex;
@@ -17,7 +19,11 @@ const ConnectContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
-const FriendList = styled.div``;
+
+// ===== mock for FriendList =====
+const onFriendClick = (email) => alert(`Typing to friend ${email}!`);
+// ===== end mock for FriendList =====
+
 
 class Root extends React.Component {
   constructor() {
@@ -36,6 +42,13 @@ class Root extends React.Component {
       history.push('/login');
       return;
     }
+    const { peer, peerId } = session;
+    // Register user as callable (online)
+    axios.post('/peer', { id: peerId })
+      .catch(() => {
+        toast.error('Failed to register peer');
+      });
+
     Media.getDevices()
       .then((devices) => {
         this.devices = devices;
@@ -51,7 +64,7 @@ class Root extends React.Component {
         toast.error(error);
       });
 
-    const { peer } = session;
+
     peer.on('call', (call) => {
       call.on('error', (err) => {
         toast.error(`Call error: ${err}`);
@@ -76,8 +89,19 @@ class Root extends React.Component {
     });
   }
 
+  onFriendCall(email) {
+    axios.get(`/peer?email=${encodeURIComponent(email)}`)
+      .then((response) => {
+        this.onCall(response.data);
+      })
+      .catch(() => {
+        toast.error('Failed to call user');
+      });
+  }
+
   // on button 'call friend' pressed
   onCall(id) {
+    console.log(id);
     // call server for 'to' id
     const { session } = this.props;
     const { peer } = session;
@@ -112,20 +136,16 @@ class Root extends React.Component {
   }
 
   render() {
-    const { input, call } = this.state;
-    const { session } = this.props;
-    const { peerId } = session;
+    const { call } = this.state;
 
     return (
       <RootContainer>
-        <ConnectContainer>
-          {peerId}
-          <input type="text" onChange={this.onInput} value={input} />
-          <input type="submit" value="Connect" onClick={this.onClick} />
-        </ConnectContainer>
-
-        <FriendList />
+        <FriendsComponent
+          onFriendClick={onFriendClick}
+          onFriendCall={this.onFriendCall}
+        />
         <Content selected={call} onCall={call} onVideo={this.onVideo} />
+
         {/* <Chat onVideo={this.onVideo} /> */}
       </RootContainer>
     );
