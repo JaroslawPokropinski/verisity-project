@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import axios from '../axios';
 
 import UsersList from './UserList';
 
@@ -16,11 +17,18 @@ class FriendsComponent extends React.Component {
     }
 
     componentDidMount() {
-      fetch('http://localhost:9000/api/friends')
-        .then((res) => res.json())
+      axios
+        .get('/api/friends', {})
         .then((response) => this.setState({ 
           allUsers: response.users,
           filteredUsers: response.users
+        })
+        .catch((err) => {
+          if (err.response) {
+            toast.error(`Failed to get friends list! ${err.response.data}`);
+          } else {
+            toast.error(`Failed to get friends list! ${err}`);
+          }
         }));
     }
   
