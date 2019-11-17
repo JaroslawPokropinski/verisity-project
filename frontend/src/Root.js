@@ -19,9 +19,8 @@ const ConnectContainer = styled.div`
 `;
 
 // ===== mock for FriendList =====
-const allUsers = ['Jarosław', 'Piotr', 'Wojciech', 'Mateusz'];
-const onFriendClick = () => alert('Typing to friend!');
-const onFriendCall = () => alert('Calling to friend!');
+const onFriendClick = (email) => alert(`Typing to friend ${email}!`);
+const onFriendCall = (email) => alert(`Calling to friend ${email}!`);
 // ===== end mock for FriendList =====
 
 
@@ -160,10 +159,9 @@ class Root extends React.Component {
           <input type="submit" value="Connect" onClick={this.onClick} />
         </ConnectContainer>
 
-        <FriendsComponent 
-          allUsers={allUsers} 
-          onFriendClick={onFriendClick} 
-          onFriendCall={onFriendCall} 
+        <FriendsComponent
+          onFriendClick={onFriendClick}
+          onFriendCall={onFriendCall}
         />
         <Content selected={null} />
         {/* <Chat onVideo={this.onVideo} /> */}
