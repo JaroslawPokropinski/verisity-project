@@ -55,6 +55,7 @@ app.server.on('connection', (client) => {
 
 app.server.on('disconnect', (client) => {
   log(`${client.id} disconnected!`);
+  userService.dismissPeerId(client.id);
 });
 
 module.exports = app;

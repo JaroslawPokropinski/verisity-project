@@ -6,7 +6,9 @@ import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 
 import Content from './Content';
+import Media from './helpers/media';
 import FriendsComponent from './friendList/FriendsComponent';
+import axios from './axios';
 
 const RootContainer = styled.div`
   display: flex;
@@ -20,35 +22,13 @@ const ConnectContainer = styled.div`
 
 // ===== mock for FriendList =====
 const onFriendClick = (email) => alert(`Typing to friend ${email}!`);
-const onFriendCall = (email) => alert(`Calling to friend ${email}!`);
 // ===== end mock for FriendList =====
 
-
-const getDevices = () => new Promise((resolve) => {
-  if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
-    return resolve({ audio: false, video: false });
-  }
-
-  navigator.mediaDevices.enumerateDevices().then((devices) => {
-    const reducer = (accumulator, device) => {
-      if (device.kind === 'audioinput') {
-        accumulator.audio = true;
-      }
-
-      if (device.kind === 'videoinput') {
-        accumulator.video = true;
-      }
-      return accumulator;
-    };
-    resolve(devices.reduce(reducer, { audio: false, video: false }));
-  });
-  return null;
-});
 
 class Root extends React.Component {
   constructor() {
     super();
-    this.state = { /* friends: null */ input: '' };
+    this.state = { /* friends: null */ input: '', call: null };
     this.mediastream = null;
     this.videoRef = null;
     this.devices = { audio: false, video: false };
@@ -62,75 +42,84 @@ class Root extends React.Component {
       history.push('/login');
       return;
     }
-    getDevices().then((devices) => {
-      this.devices = devices;
-      if (!this.devices.audio) {
-        toast.warn('We couldn\'t detect microphone');
-      }
+    const { peer, peerId } = session;
+    // Register user as callable (online)
+    axios.post('/peer', { id: peerId })
+      .catch(() => {
+        toast.error('Failed to register peer');
+      });
 
-      if (!this.devices.video) {
-        toast.warn('We couldn\'t detect camera');
-      }
-    });
+    Media.getDevices()
+      .then((devices) => {
+        this.devices = devices;
+        if (!this.devices.audio) {
+          toast.warn('We couldn\'t detect microphone');
+        }
 
-    const { peer } = session;
+        if (!this.devices.video) {
+          toast.warn('We couldn\'t detect camera');
+        }
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
+
+
     peer.on('call', (call) => {
       call.on('error', (err) => {
         toast.error(`Call error: ${err}`);
       });
-      // Answer the call, providing our mediaStream
-      if (navigator.mediaDevices
-        && navigator.mediaDevices.getUserMedia
-        && navigator.mediaDevices.enumerateDevices) {
-        navigator.mediaDevices
-          .getUserMedia({ audio: this.devices.audio, video: this.devices.video })
-          .then((stream) => {
-            call.answer(stream);
-            call.on('stream', (incoming) => {
-              // provide stream to video element
-              if (this.videoRef.current !== null) {
-                this.videoRef.current.srcObject = incoming;
-                this.videoRef.current.play();
-              }
-            });
-          })
-          .catch((error) => {
-            toast.error(`Failed to get video with error: ${error}`);
-          });
-      } else {
-        // Inform user about error
-        toast.error('Your browser doesnt support navigator.mediaDevices');
-        call.close();
-      }
-    });
-  }
 
-  onCall(id) {
-    // on button 'call friend' pressed
-    // call server for 'to' id
-    const { session } = this.props;
-    const { peer } = session;
-    if (navigator.mediaDevices
-      && navigator.mediaDevices.getUserMedia
-      && navigator.mediaDevices.enumerateDevices) {
-      navigator.mediaDevices.getUserMedia({ audio: this.devices.audio, video: this.devices.video })
+      Media.getMedia(this.devices)
         .then((stream) => {
-          const call = peer.call(id, stream);
+          call.answer(stream);
           call.on('stream', (incoming) => {
             // provide stream to video element
-            if (this.videoRef.current !== null) {
+            if (this.videoRef && this.videoRef.current) {
               this.videoRef.current.srcObject = incoming;
               this.videoRef.current.play();
             }
           });
+          console.log(call);
+          this.setState({ call: { peer: call.peer } });
         })
         .catch((error) => {
           toast.error(`Failed to get video with error: ${error}`);
         });
-    } else {
-      // Inform user about error
-      toast.error('Your browser doesnt support navigator.mediaDevices');
-    }
+    });
+  }
+
+  onFriendCall(email) {
+    axios.get(`/peer?email=${encodeURIComponent(email)}`)
+      .then((response) => {
+        this.onCall(response.data);
+      })
+      .catch(() => {
+        toast.error('Failed to call user');
+      });
+  }
+
+  // on button 'call friend' pressed
+  onCall(id) {
+    console.log(id);
+    // call server for 'to' id
+    const { session } = this.props;
+    const { peer } = session;
+    Media.getMedia(this.devices)
+      .then((stream) => {
+        const call = peer.call(id, stream);
+        call.on('stream', (incoming) => {
+          // provide stream to video element
+          if (this.videoRef && this.videoRef.current) {
+            this.videoRef.current.srcObject = incoming;
+            this.videoRef.current.play();
+          }
+        });
+        this.setState({ call: { peer: call.peer } });
+      })
+      .catch((error) => {
+        toast.error(`Failed to get video with error: ${error}`);
+      });
   }
 
   onVideo(ref) {
@@ -147,23 +136,16 @@ class Root extends React.Component {
   }
 
   render() {
-    const { input } = this.state;
-    const { session } = this.props;
-    const { peerId } = session;
+    const { call } = this.state;
 
     return (
       <RootContainer>
-        <ConnectContainer>
-          {peerId}
-          <input type="text" onChange={this.onInput} value={input} />
-          <input type="submit" value="Connect" onClick={this.onClick} />
-        </ConnectContainer>
-
         <FriendsComponent
           onFriendClick={onFriendClick}
-          onFriendCall={onFriendCall}
+          onFriendCall={this.onFriendCall}
         />
-        <Content selected={null} />
+        <Content selected={call} onCall={call} onVideo={this.onVideo} />
+
         {/* <Chat onVideo={this.onVideo} /> */}
       </RootContainer>
     );

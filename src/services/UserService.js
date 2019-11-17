@@ -14,6 +14,8 @@ class UserService {
    */
   constructor(UserModel, FriendsModel, MessageModel) {
     this.UserModel = UserModel;
+    this.peers = new Map();
+    this.peerToId = new Map();
     this.FriendsModel = FriendsModel;
     this.MessageModel = MessageModel;
     log(JSON.stringify(UserModel));
@@ -72,19 +74,36 @@ class UserService {
     });
   }
 
+  setPeerId(email, id) {
+    this.peers.set(email, id);
+    this.peerToId.set(id, email);
+  }
+
+  getPeerId(email) {
+    return this.peers.get(email);
+  }
+
+  dismissPeerId(id) {
+    const email = this.peerToId.get(id);
+    if (email) {
+      this.peers.delete(email);
+      this.peerToId.delete(id);
+    }
+  }
+
   //FriendsRelation function
   getFriendsList(userName) {
     return new Promise((resolve, reject) => {
       let user = null;
 
-      this.UserModel.findOne({where: {name: userName}})
-      .then((_user) => {
-        if (_user === null) {
-          reject({ errorMessage: `There is no user with name = ${userName} in database!`});
-        }
-        user = _user;
-      })
-        .then(() => user.getFriend({where: {}, through: {where: {isAccepted: true}}, attributes: ['name', 'email'], includeIgnoreAttributes: false}))
+      this.UserModel.findOne({ where: { name: userName } })
+        .then((_user) => {
+          if (_user === null) {
+            reject({ errorMessage: `There is no user with name = ${userName} in database!` });
+          }
+          user = _user;
+        })
+        .then(() => user.getFriend({ where: {}, through: { where: { isAccepted: true } }, attributes: ['name', 'email'], includeIgnoreAttributes: false }))
         .then((friendsList) => resolve(friendsList))
         .catch((error) => {
           log('Database error!', error.message);
@@ -97,14 +116,14 @@ class UserService {
     return new Promise((resolve, reject) => {
       let user = null;
 
-      this.UserModel.findOne({where: {name: userName}})
+      this.UserModel.findOne({ where: { name: userName } })
         .then((_user) => {
           if (_user === null) {
-            reject({ errorMessage: `There is no user with name = ${userName} in database!`});
+            reject({ errorMessage: `There is no user with name = ${userName} in database!` });
           }
           user = _user;
         })
-        .then(() => user.getUser({where: {}, through: {where: {isAccepted: false}}, attributes: ['name', 'email'], includeIgnoreAttributes: false}))
+        .then(() => user.getUser({ where: {}, through: { where: { isAccepted: false } }, attributes: ['name', 'email'], includeIgnoreAttributes: false }))
         .then((pendingInvitations) => resolve(pendingInvitations))
         .catch((error) => {
           log('Database error!', error.message);
@@ -112,33 +131,33 @@ class UserService {
         });
     });
   }
-  
+
   inviteFriend(userName, userToInviteName) {
     return new Promise((resolve, reject) => {
       let userToInvite = null;
       let user = null;
 
-      this.UserModel.findOne({where: {name: userToInviteName}})
+      this.UserModel.findOne({ where: { name: userToInviteName } })
         .then((_userToInvite) => {
           if (_userToInvite === null) {
-            reject({ errorMessage: `There is no user with name = ${userToInviteName} in database!`});
+            reject({ errorMessage: `There is no user with name = ${userToInviteName} in database!` });
           }
           userToInvite = _userToInvite;
         })
-        .then(() => this.UserModel.findOne({where: {name: userName}}))
+        .then(() => this.UserModel.findOne({ where: { name: userName } }))
         .then((_user) => {
           if (_user === null) {
-            reject({ errorMessage: `There is no user with name = ${userName} in database!`});
+            reject({ errorMessage: `There is no user with name = ${userName} in database!` });
           }
           user = _user;
         })
-        .then(() => user.addFriend(userToInvite, {through: {isAccepted: false}}))
+        .then(() => user.addFriend(userToInvite, { through: { isAccepted: false } }))
         .then((created) => resolve(created))
         .catch((error) => {
           log('Database error!', error.message);
           reject({ errorMessage: 'Database error!' });
         });
-      });
+    });
   }
 
   acceptInvitation(userName, userToAcceptName) {
@@ -146,30 +165,30 @@ class UserService {
       let userToAccept = null;
       let user = null;
 
-      this.UserModel.findOne({where: {name: userToAcceptName}})
+      this.UserModel.findOne({ where: { name: userToAcceptName } })
         .then((_userToAccept) => {
           if (_userToAccept === null) {
-            reject({ errorMessage: `There is no user with name = ${userToAcceptName} in database!`});
+            reject({ errorMessage: `There is no user with name = ${userToAcceptName} in database!` });
           }
           userToAccept = _userToAccept;
         })
-        .then(() => this.UserModel.findOne({where: {name: userName}}))
+        .then(() => this.UserModel.findOne({ where: { name: userName } }))
         .then((_user) => {
           if (_user === null) {
-            reject({ errorMessage: `There is no user with name = ${userName} in database!`});
+            reject({ errorMessage: `There is no user with name = ${userName} in database!` });
           }
           user = _user;
         })
-        .then(() => this.FriendsModel.findOne({where:{user: userToAccept.id, friend: user.id, isAccepted: false}}))
+        .then(() => this.FriendsModel.findOne({ where: { user: userToAccept.id, friend: user.id, isAccepted: false } }))
         .then((relation) => {
-          if(relation === null) {
+          if (relation === null) {
             log(`Users are friends already, or there is no invitation from user ${userToAcceptName} to user ${userName}!`);
             reject({ errorMessage: `Users are friends already, or there is no invitation from user ${userToAcceptName} to user ${userName}!` });
           }
           relation.isAccepted = true;
           relation.save();
         })
-        .then(() => user.addFriend(userToAccept, {through: {isAccepted: true}}))
+        .then(() => user.addFriend(userToAccept, { through: { isAccepted: true } }))
         .then((result) => resolve(result))
         .catch((error) => {
           log('Database error!', error.message);
@@ -185,29 +204,29 @@ class UserService {
       let receiver = null;
       let relation = null;
 
-      this.UserModel.findOne({where: {name: senderName}})
+      this.UserModel.findOne({ where: { name: senderName } })
         .then((_sender) => {
           if (_sender === null) {
-            reject({ errorMessage: `There is no user with name = ${senderName} in database!`});
+            reject({ errorMessage: `There is no user with name = ${senderName} in database!` });
           }
           sender = _sender;
         })
-        .then(() => this.UserModel.findOne({where: {name: receiverName}}))
+        .then(() => this.UserModel.findOne({ where: { name: receiverName } }))
         .then((_receiver) => {
           if (_receiver === null) {
-            reject({ errorMessage: `There is no user with name = ${receiverName} in database!`});
+            reject({ errorMessage: `There is no user with name = ${receiverName} in database!` });
           }
           receiver = _receiver;
         })
-        .then(() => this.FriendsModel.findOne({where: {user: sender.id, friend: receiver.id}}))
+        .then(() => this.FriendsModel.findOne({ where: { user: sender.id, friend: receiver.id } }))
         .then((_relation) => {
           if (_relation === null || _relation.isAccepted == false) {
             log(`You are not friend with user ${receiverName}!`);
-            reject({ errorMessage: `You are not friend with user ${receiverName}!`});
+            reject({ errorMessage: `You are not friend with user ${receiverName}!` });
           }
           relation = _relation;
         })
-        .then(() => this.MessageModel.create({content: msgContent}))
+        .then(() => this.MessageModel.create({ content: msgContent }))
         .then((msg) => msg.setFriends_relation(relation)) // TODO: change friends table name
         .then((result) => resolve(result))
         .catch((error) => {
@@ -224,24 +243,24 @@ class UserService {
       let receiver = null;
       let relation = null;
 
-      this.UserModel.findOne({where: {name: senderName}})
+      this.UserModel.findOne({ where: { name: senderName } })
         .then((_sender) => {
           if (_sender === null) {
-            reject({ errorMessage: `There is no user with name = ${senderName} in database!`});
+            reject({ errorMessage: `There is no user with name = ${senderName} in database!` });
           }
           sender = _sender;
         })
-        .then(() => this.UserModel.findOne({where: {name: receiverName}}))
+        .then(() => this.UserModel.findOne({ where: { name: receiverName } }))
         .then((_receiver) => {
           if (_receiver === null) {
-            reject({ errorMessage: `There is no user with name = ${receiverName} in database!`});
+            reject({ errorMessage: `There is no user with name = ${receiverName} in database!` });
           }
           receiver = _receiver;
         })
-        .then(() => this.FriendsModel.findOne({where: {user: sender.id, friend: receiver.id, isAccepted: true}}))
+        .then(() => this.FriendsModel.findOne({ where: { user: sender.id, friend: receiver.id, isAccepted: true } }))
         .then((rel) => {
           if (rel === null) {
-            reject({ errorMessage: `You are not friend with user ${receiverName}!`});
+            reject({ errorMessage: `You are not friend with user ${receiverName}!` });
           }
           relation = rel;
         })
@@ -265,24 +284,24 @@ class UserService {
       let resultList = [];
       let relation = null;
 
-      this.UserModel.findOne({where: {name: senderName}})
+      this.UserModel.findOne({ where: { name: senderName } })
         .then((_sender) => {
           if (_sender === null) {
-            reject({ errorMessage: `There is no user with name = ${senderName} in database!`});
+            reject({ errorMessage: `There is no user with name = ${senderName} in database!` });
           }
           sender = _sender;
         })
-        .then(() => this.UserModel.findOne({where: {name: receiverName}}))
+        .then(() => this.UserModel.findOne({ where: { name: receiverName } }))
         .then((_receiver) => {
           if (_receiver === null) {
-            reject({ errorMessage: `There is no user with name = ${receiverName} in database!`});
+            reject({ errorMessage: `There is no user with name = ${receiverName} in database!` });
           }
           receiver = _receiver;
         })
-        .then(() => this.FriendsModel.findOne({where: {user: sender.id, friend: receiver.id, isAccepted: true}}))
+        .then(() => this.FriendsModel.findOne({ where: { user: sender.id, friend: receiver.id, isAccepted: true } }))
         .then((_relation) => {
           if (_relation === null) {
-            reject({ errorMessage: `You are not friend with user ${receiverName}!`});
+            reject({ errorMessage: `You are not friend with user ${receiverName}!` });
           }
           relation = _relation;
         })
@@ -292,10 +311,10 @@ class UserService {
           messages.map(msg => msg.author = senderName);
           resultList = resultList.concat(messages);
         })
-        .then(() => this.FriendsModel.findOne({where: {user: receiver.id, friend: sender.id, isAccepted: true}}))
+        .then(() => this.FriendsModel.findOne({ where: { user: receiver.id, friend: sender.id, isAccepted: true } }))
         .then((_relation) => {
           if (_relation === null) {
-            reject({ errorMessage: `You are not friend with user ${receiverName}!`});
+            reject({ errorMessage: `You are not friend with user ${receiverName}!` });
           }
           relation = _relation;
         })
