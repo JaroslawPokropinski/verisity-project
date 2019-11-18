@@ -32,6 +32,7 @@
     "peer": "git+https://github.com/peers/peerjs-server.git",
     "pg": "^7.12.1",
     "swagger-jsdoc": "^3.4.0",
+    "selenium-webdriver": "^4.0.0-alpha.5",
     "sequelize": "^5.19.2"
   },
   "devDependencies": {

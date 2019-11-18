@@ -132,7 +132,7 @@ class Register extends React.Component {
               <TextInput type="password" id="rep-password" onChange={this.onPassRepChange} value={repeatedPassword} />
             </Label>
 
-            <Submit type="submit" value="Submit" />
+            <Submit type="submit" id ="submit" value="Submit" />
           </form>
         </Container>
       </Flex>

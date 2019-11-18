@@ -127,7 +127,7 @@ class Login extends React.Component {
               Password:
               <TextInput type="password" id="password" onChange={this.onPassChange} value={password} />
             </Label>
-            <Submit type="submit" value="Submit" />
+            <Submit type="submit" id ="submit" value="Submit" />
           </form>
 
           <Register />
