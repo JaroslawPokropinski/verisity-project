@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import axios from '../axios';
 
 import UsersList from './UserList';
+import AddFriendComponent from './AddFriendComponent';
 
 class FriendsComponent extends React.Component {
   constructor(props) {
@@ -54,8 +55,10 @@ class FriendsComponent extends React.Component {
     const { onFriendClick, onFriendCall } = this.props;
     return (
       <div className="FriendListComponent">
+        <AddFriendComponent />
         <input
           className="findUsersInput"
+          placeholder="Filter your friends"
           onChange={this.filter}
         />
         <UsersList
