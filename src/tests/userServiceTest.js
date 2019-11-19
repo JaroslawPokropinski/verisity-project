@@ -86,7 +86,7 @@ describe("UserService", function () {
       database.sync({force: true})
         .then(() => userService.addUser('asd@asd.pl', 'user1', 'user1'))
         .then(() => userService.addUser('qwe@qwe.pl', 'user2', 'user2'))
-        .then(() => userService.inviteFriend('user1', 'user2'))
+        .then(() => userService.inviteFriend('asd@asd.pl', 'qwe@qwe.pl'))
         .then(() => {
           let user1 = null;
 
@@ -111,8 +111,8 @@ describe("UserService", function () {
       database.sync({force: true})
       .then(() => userService.addUser('asd@asd.pl', 'user1', 'user1'))
       .then(() => userService.addUser('qwe@qwe.pl', 'user2', 'user2'))
-      .then(() => userService.inviteFriend('user1', 'user2'))
-      .then(() => userService.acceptInvitation('user2', 'user1'))
+      .then(() => userService.inviteFriend('asd@asd.pl', 'qwe@qwe.pl'))
+      .then(() => userService.acceptInvitation('qwe@qwe.pl', 'asd@asd.pl'))
       .then(() => {
         let user = null;
 
@@ -134,15 +134,15 @@ describe("UserService", function () {
       .then(() => userService.addUser('asd@asd.pl', 'user1', 'user1'))
       .then(() => userService.addUser('qwe@qwe.pl', 'user2', 'user2'))
       .then(() => userService.addUser('zxc@zxc.pl', 'user3', 'user3'))
-      .then(() => userService.inviteFriend('user1', 'user2'))
-      .then(() => userService.acceptInvitation('user2', 'user1'))
-      .then(() => userService.inviteFriend('user3', 'user2'))
-      .then(() => userService.getFriendsList('user2'))
+      .then(() => userService.inviteFriend('asd@asd.pl', 'qwe@qwe.pl'))
+      .then(() => userService.acceptInvitation('qwe@qwe.pl', 'asd@asd.pl'))
+      .then(() => userService.inviteFriend('zxc@zxc.pl', 'qwe@qwe.pl'))
+      .then(() => userService.getFriendsList('qwe@qwe.pl'))
       .then((friendsList) => {
         chai.expect(JSON.stringify(friendsList)).to.equal('[{"name":"user1","email":"asd@asd.pl"}]');
       })
-      .then(() => userService.acceptInvitation('user2', 'user3'))
-      .then(() => userService.getFriendsList('user2'))
+      .then(() => userService.acceptInvitation('qwe@qwe.pl', 'zxc@zxc.pl'))
+      .then(() => userService.getFriendsList('qwe@qwe.pl'))
       .then((friendsList) => {
         chai.expect(JSON.stringify(friendsList)).to.equal('[{"name":"user1","email":"asd@asd.pl"},{"name":"user3","email":"zxc@zxc.pl"}]');
       })
@@ -154,13 +154,13 @@ describe("UserService", function () {
       database.sync({force: true})
       .then(() => userService.addUser('asd@asd.pl', 'user1', 'user1'))
       .then(() => userService.addUser('qwe@qwe.pl', 'user2', 'user2'))
-      .then(() => userService.inviteFriend('user1', 'user2'))
-      .then(() => userService.getPendingInvitations('user2'))
+      .then(() => userService.inviteFriend('asd@asd.pl', 'qwe@qwe.pl'))
+      .then(() => userService.getPendingInvitations('qwe@qwe.pl'))
       .then((invitations) => {
         chai.expect(JSON.stringify(invitations)).to.equal('[{"name":"user1","email":"asd@asd.pl"}]');
       })
-      .then(() => userService.acceptInvitation('user2', 'user1'))
-      .then(() => userService.getPendingInvitations('user2'))
+      .then(() => userService.acceptInvitation('qwe@qwe.pl', 'asd@asd.pl'))
+      .then(() => userService.getPendingInvitations('qwe@qwe.pl'))
       .then((empty_list) => {
         chai.expect(empty_list).to.be.empty;
       })
@@ -188,9 +188,9 @@ describe("UserService", function () {
       database.sync({force: true})
         .then(() => userService.addUser('asd@asd.pl', 'user1', 'user1'))
         .then(() => userService.addUser('qwe@qwe.pl', 'user2', 'user2'))
-        .then(() => userService.inviteFriend('user1', 'user2'))
-        .then(() => userService.acceptInvitation('user2', 'user1'))
-        .then(() => userService.sendMessage('user1', 'user2', 'Asdasdasdasd.'))
+        .then(() => userService.inviteFriend('asd@asd.pl', 'qwe@qwe.pl'))
+        .then(() => userService.acceptInvitation('qwe@qwe.pl', 'asd@asd.pl'))
+        .then(() => userService.sendMessage('asd@asd.pl', 'qwe@qwe.pl', 'Asdasdasdasd.'))
         .then(() => userService.MessageModel.findOne({where: {id: 1}}))
         .then((msg) => {
           chai.expect(msg).not.to.be.null;
@@ -204,11 +204,11 @@ describe("UserService", function () {
       database.sync({force: true})
         .then(() => userService.addUser('asd@asd.pl', 'user1', 'user1'))
         .then(() => userService.addUser('qwe@qwe.pl', 'user2', 'user2'))
-        .then(() => userService.inviteFriend('user1', 'user2'))
-        .then(() => userService.acceptInvitation('user2', 'user1'))
-        .then(() => userService.sendMessage('user1', 'user2', 'Asdasdasdasd.'))
-        .then(() => userService.sendMessage('user1', 'user2', 'Qweqweqweqwe.'))
-        .then(() => userService.getMessages('user1', 'user2'))
+        .then(() => userService.inviteFriend('asd@asd.pl', 'qwe@qwe.pl'))
+        .then(() => userService.acceptInvitation('qwe@qwe.pl', 'asd@asd.pl'))
+        .then(() => userService.sendMessage('asd@asd.pl', 'qwe@qwe.pl', 'Asdasdasdasd.'))
+        .then(() => userService.sendMessage('asd@asd.pl', 'qwe@qwe.pl', 'Qweqweqweqwe.'))
+        .then(() => userService.getMessages('asd@asd.pl', 'qwe@qwe.pl'))
         .then((msgList) => {
           chai.expect(msgList).not.to.be.empty;
           chai.expect(msgList.length).to.be.equal(2);
@@ -223,12 +223,12 @@ describe("UserService", function () {
       database.sync({force: true})
         .then(() => userService.addUser('asd@asd.pl', 'user1', 'user1'))
         .then(() => userService.addUser('qwe@qwe.pl', 'user2', 'user2'))
-        .then(() => userService.inviteFriend('user1', 'user2'))
-        .then(() => userService.acceptInvitation('user2', 'user1'))
-        .then(() => userService.sendMessage('user1', 'user2', 'Asdasdasdasd.'))
-        .then(() => userService.sendMessage('user1', 'user2', 'Qweqweqweqwe.'))
-        .then(() => userService.sendMessage('user2', 'user1', 'User2 msg.'))
-        .then(() => userService.getConversation('user1', 'user2'))
+        .then(() => userService.inviteFriend('asd@asd.pl', 'qwe@qwe.pl'))
+        .then(() => userService.acceptInvitation('qwe@qwe.pl', 'asd@asd.pl'))
+        .then(() => userService.sendMessage('asd@asd.pl', 'qwe@qwe.pl', 'Asdasdasdasd.'))
+        .then(() => userService.sendMessage('asd@asd.pl', 'qwe@qwe.pl', 'Qweqweqweqwe.'))
+        .then(() => userService.sendMessage('qwe@qwe.pl', 'asd@asd.pl', 'User2 msg.'))
+        .then(() => userService.getConversation('asd@asd.pl', 'qwe@qwe.pl'))
         .then((msgList) => {
           chai.expect(msgList).not.to.be.empty;
           chai.expect(msgList.length).to.be.equal(3);

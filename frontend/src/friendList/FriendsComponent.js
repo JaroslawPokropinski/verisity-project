@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
+import { TextField } from '@material-ui/core';
 import axios from '../axios';
 
 import UsersList from './UserList';
@@ -56,9 +57,7 @@ class FriendsComponent extends React.Component {
     return (
       <div className="FriendListComponent">
         <AddFriendComponent />
-        <input
-          className="findUsersInput"
-          placeholder="Filter your friends"
+        <TextField
           onChange={this.filter}
         />
         <UsersList
