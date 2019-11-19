@@ -145,8 +145,8 @@ class Root extends React.Component {
           onFriendClick={onFriendClick}
           onFriendCall={this.onFriendCall}
         />
-        <Content selected={call} onCall={call} onVideo={this.onVideo} />
         <TextChatComponent></TextChatComponent>
+        <Content selected={call} onCall={call} onVideo={this.onVideo} />
         {/* <Chat onVideo={this.onVideo} /> */}
       </RootContainer>
     );
