@@ -18,7 +18,7 @@ function MessageList({ messages }) {
 };
 
 
-MesssageList.PropTypes = {
+MessageList.PropTypes = {
     messages: PropTypes.arrayOf(PropTypes.shape({ content: PropTypes.string })).isRequired,
 }
 

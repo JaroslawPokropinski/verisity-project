@@ -12,6 +12,7 @@ import Content from './Content';
 import Media from './helpers/media';
 import FriendsComponent from './friendList/FriendsComponent';
 import InvitationComponent from './invitationList/InvitationComponent';
+import TextChatComponent from './textChat/TextChatComponent';
 import axios from './axios';
 import Drawer from './components/Drawer';
 
@@ -174,8 +175,8 @@ class Root extends React.Component {
             />
           </div>
         </Drawer>
+        <TextChatComponent></TextChatComponent>
         <Content className={classes.content} selected={call} onCall={call} onVideo={this.onVideo} />
-
         {/* <Chat onVideo={this.onVideo} /> */}
       </div>
     );
