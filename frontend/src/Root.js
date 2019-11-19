@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import Content from './Content';
 import Media from './helpers/media';
 import FriendsComponent from './friendList/FriendsComponent';
+import TextChatComponent from './textChat/TextChatComponent';
 import axios from './axios';
 
 const RootContainer = styled.div`
@@ -145,7 +146,7 @@ class Root extends React.Component {
           onFriendCall={this.onFriendCall}
         />
         <Content selected={call} onCall={call} onVideo={this.onVideo} />
-
+        <TextChatComponent></TextChatComponent>
         {/* <Chat onVideo={this.onVideo} /> */}
       </RootContainer>
     );
