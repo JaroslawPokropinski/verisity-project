@@ -3,11 +3,10 @@ import PropTypes from 'prop-types';
 
 import Message from './Message';
 
-
 //create list of messages
 function MessageList({ messages }) {
     return (
-        <div>
+        <div class="MessageList">
             {messages.map((message) => (
                 <Message
                     text={message.content}
@@ -16,7 +15,6 @@ function MessageList({ messages }) {
         </div>
     );
 };
-
 
 MessageList.PropTypes = {
     messages: PropTypes.arrayOf(PropTypes.shape({ content: PropTypes.string })).isRequired,

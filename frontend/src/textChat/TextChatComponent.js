@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import MessageList from './MessageList';
 
+
 class TextChatComponent extends React.Component {
 
     render() {
@@ -10,15 +11,19 @@ class TextChatComponent extends React.Component {
             'content': 'message 1'
         };
         const msg2 = {
-            'content': 'message 2'
+            'content': 'fdssfads'
         }
-        const msgs = [msg1, msg2]
+        const msg3 = {
+            'content': 'fkajhfkjdsafdsa'
+        }
+        const msgs = [msg1, msg2, msg3]
         return (
             <div className="TextChatComponent">
             <p>TEXTCHAT</p>
             <MessageList
                 messages={msgs}
             />
+            <input class="TextChatInput"/>
             </div>
         )
     }
