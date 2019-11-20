@@ -5,6 +5,7 @@ import { TextField } from '@material-ui/core';
 import axios from '../axios';
 
 import UsersList from './UserList';
+import AddFriendComponent from './AddFriendComponent';
 
 class FriendsComponent extends React.Component {
   constructor(props) {
@@ -54,7 +55,8 @@ class FriendsComponent extends React.Component {
     const { filteredUsers } = this.state;
     const { onFriendClick, onFriendCall } = this.props;
     return (
-      <div>
+      <div className="FriendListComponent">
+        <AddFriendComponent />
         <TextField
           onChange={this.filter}
         />
