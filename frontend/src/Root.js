@@ -11,6 +11,7 @@ import AppBar from './components/AppBar';
 import Content from './Content';
 import Media from './helpers/media';
 import FriendsComponent from './friendList/FriendsComponent';
+import InvitationComponent from './invitationList/InvitationComponent';
 import axios from './axios';
 import Drawer from './components/Drawer';
 
@@ -143,6 +144,17 @@ class Root extends React.Component {
     this.setState({ mobileOpen: !mobileOpen });
   }
 
+  acceptFriend(email) {
+    axios
+    .post('/friends/invitations', { email })
+      .then(() => {
+        toast.success(`Friend ${email} accepted!`);
+      })
+      .catch(() => {
+        toast.error('Failed to accept user');
+      });
+  }
+
   render() {
     const { classes } = this.props;
     const { call, mobileOpen } = this.state;
@@ -152,10 +164,15 @@ class Root extends React.Component {
         <CssBaseline />
         <AppBar handleDrawerToggle={this.onMobileOpen} />
         <Drawer handleDrawerToggle={this.onMobileOpen} mobileOpen={mobileOpen}>
-          <FriendsComponent
-            onFriendClick={onFriendClick}
-            onFriendCall={this.onFriendCall}
-          />
+          <div>
+            <FriendsComponent
+              onFriendClick={onFriendClick}
+              onFriendCall={this.onFriendCall}
+            />
+            <InvitationComponent
+              acceptFriend={this.acceptFriend}
+            />
+          </div>
         </Drawer>
         <Content className={classes.content} selected={call} onCall={call} onVideo={this.onVideo} />
 
