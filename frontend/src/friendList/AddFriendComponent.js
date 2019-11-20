@@ -20,11 +20,11 @@ class AddFriendComponent extends React.Component {
         });
     }
 
-  addFriend() { 
+  addFriend() {
     const { username } = this.state;
 
     axios
-    .post('/friends', { username })
+    .post('/friends', { email: username})
     .then(() => {
       toast.success(`Invitation for ${username} was sent!`);
     })
@@ -45,9 +45,9 @@ class AddFriendComponent extends React.Component {
           placeholder="Find user to add"
           onChange={this.handleChange}
         />
-        <button 
+        <button
           type="button"
-          onClick={this.addFriend}    
+          onClick={this.addFriend}
         >
           ADD
         </button>
