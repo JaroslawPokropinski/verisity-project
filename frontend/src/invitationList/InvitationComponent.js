@@ -41,5 +41,5 @@ class InvitationComponent extends React.Component {
     );
   }
 }
-    
+
 export default InvitationComponent;

@@ -1,31 +1,59 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import { toast } from 'react-toastify';
 import MessageList from './MessageList';
+import axios from '../axios';
 
 
 class TextChatComponent extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            messages: [],
+        };
+    }
 
     render() {
-        const msg1 = {
-            'content': 'message 1'
-        };
-        const msg2 = {
-            'content': 'fdssfads'
-        }
-        const msg3 = {
-            'content': 'fkajhfkjdsafdsa'
-        }
-        const msgs = [msg1, msg2, msg3]
+        const { messages } = this.state;
         return (
             <div className="TextChatComponent">
-            <p>TEXTCHAT</p>
             <MessageList
-                messages={msgs}
+                messages={messages}
             />
-            <input class="TextChatInput"/>
+            <input
+                class="TextChatInput"
+                onKeyPress={this.sendMessage}
+            />
             </div>
         )
+    }
+
+    componentDidMount() {
+        axios
+            .get('friends/admin@example.com')
+            .then((response) => {
+                this.setState({
+                    messages: response.data
+                });
+            })
+            .catch((err) => {
+                if (err.response) {
+                toast.error(`Failed to get messages list! ${err.response.data}`);
+                } else {
+                toast.error(`Failed to get messages list! ${err}`);
+                }
+            });
+    }
+
+    sendMessage(e) {
+        var keyCode = e.keyCode || e.which;
+        if (keyCode != '13') { return; }
+
+        const message = e.target.value;
+        e.target.value = "";
+
+        axios
+            .post('/friends/admin@example.com', message)
     }
 };
 
