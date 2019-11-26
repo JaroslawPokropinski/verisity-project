@@ -15,7 +15,8 @@ class TextChatComponent extends React.Component {
     }
 
     render() {
-        const { messages } = this.state;
+        var { messages } = this.state;
+        messages = messages.sort(function(a, b) { return a.created > b.created; });
         return (
             <div className="TextChatComponent">
             <MessageList
@@ -38,6 +39,7 @@ class TextChatComponent extends React.Component {
         axios
         .get('friends/' + friend)
         .then((response) => {
+            console.log(response.data);
             this.setState({
                 messages: response.data
             });
