@@ -27,29 +27,11 @@ html {
   height: 50px;
 }
 
-
-.TextChatComponent {
-  background: #254D73;
-  padding: 5px;
-  margin: 8px 0px 8px 0px;
-  border-radius: 5px;
-  width: 400px;
-}
-
-.TextChatInput {
-  position: absolute;
-  bottom: 15px;
-}
-
 .MessageList {
-
+  overflow: auto;
+  height: 90%;
 }
 
-.MessageList .Message {
-  background: white;
-  border-radius: 5px;
-  padding: 5px 15px 5px 15px;
-  clear: both;
-  margin-bottom: 8px;
-  width: max-content;
+.MessageList .ListItem {
+  border: solid;
 }

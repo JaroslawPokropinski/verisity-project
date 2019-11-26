@@ -2,16 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Message from './Message';
+import List from '@material-ui/core/List';
 
 //create list of messages
 function MessageList({ messages }) {
     return (
         <div class="MessageList">
-            {messages.map((message) => (
-                <Message
-                    text={message.content}
-                />
-            ))}
+            <List>
+                {messages.map((message) => (
+                    <Message
+                        message={message}
+                    />
+                ))}
+            </List>
         </div>
     );
 };

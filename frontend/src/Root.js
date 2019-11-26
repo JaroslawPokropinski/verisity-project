@@ -172,7 +172,7 @@ class Root extends React.Component {
     return (
       <div className={classes.root}>
         <CssBaseline />
-        <AppBar handleDrawerToggle={this.onMobileOpen} />
+        {<AppBar handleDrawerToggle={this.onMobileOpen} />}
         <Drawer handleDrawerToggle={this.onMobileOpen} mobileOpen={mobileOpen}>
           <div>
             <FriendsComponent
@@ -184,11 +184,10 @@ class Root extends React.Component {
             />
           </div>
         </Drawer>
-        <TextChatComponent
-          get_friend={this.getTextchatFriend}
-        />
+        <TextChatComponent get_friend={this.getTextchatFriend} />
         <Content className={classes.content} selected={call} onCall={call} onVideo={this.onVideo} />
         {/* <Chat onVideo={this.onVideo} /> */}
+
       </div>
     );
   }

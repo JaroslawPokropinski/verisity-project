@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import MessageList from './MessageList';
 import axios from '../axios';
+import TextField from '@material-ui/core/TextField';
 
 
 class TextChatComponent extends React.Component {
@@ -16,13 +17,13 @@ class TextChatComponent extends React.Component {
 
     render() {
         var { messages } = this.state;
-        messages = messages.sort(function(a, b) { return a.created > b.created; });
+        messages = messages.sort(function(a, b) { return a.createdAt > b.createdAt; });
         return (
             <div className="TextChatComponent">
             <MessageList
                 messages={messages}
             />
-            <input
+            <TextField
                 class="TextChatInput"
                 onKeyPress={this.sendMessage.bind(this)}
             />
@@ -39,7 +40,6 @@ class TextChatComponent extends React.Component {
         axios
         .get('friends/' + friend)
         .then((response) => {
-            console.log(response.data);
             this.setState({
                 messages: response.data
             });
