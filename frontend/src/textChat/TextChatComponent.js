@@ -10,6 +10,7 @@ class TextChatComponent extends React.Component {
         super(props);
         this.state = {
             messages: [],
+            get_friend: props.get_friend
         };
     }
 
@@ -22,38 +23,44 @@ class TextChatComponent extends React.Component {
             />
             <input
                 class="TextChatInput"
-                onKeyPress={this.sendMessage}
+                onKeyPress={this.sendMessage.bind(this)}
             />
             </div>
         )
     }
 
     componentDidMount() {
+        const { get_friend } = this.state;
+        this.getMessages(get_friend())
+    }
+
+    getMessages(friend) {
         axios
-            .get('friends/admin@example.com')
-            .then((response) => {
-                this.setState({
-                    messages: response.data
-                });
-            })
-            .catch((err) => {
-                if (err.response) {
-                toast.error(`Failed to get messages list! ${err.response.data}`);
-                } else {
-                toast.error(`Failed to get messages list! ${err}`);
-                }
+        .get('friends/' + friend)
+        .then((response) => {
+            this.setState({
+                messages: response.data
             });
+        })
+        .catch((err) => {
+            if (err.response) {
+            toast.error(`Failed to get messages list! ${err.response.data}`);
+            } else {
+            toast.error(`Failed to get messages list! ${err}`);
+            }
+        });
     }
 
     sendMessage(e) {
         var keyCode = e.keyCode || e.which;
         if (keyCode != '13') { return; }
-
+        const { get_friend } = this.state;
         const message = e.target.value;
         e.target.value = "";
-
+        const friend = get_friend();
         axios
-            .post('/friends/admin@example.com', message)
+            .post('/friends/' + friend, {message: message});
+        this.getMessages(friend);
     }
 };
 
