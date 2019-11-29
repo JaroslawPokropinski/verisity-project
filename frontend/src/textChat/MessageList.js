@@ -6,10 +6,16 @@ import List from '@material-ui/core/List';
 
 //create list of messages
 function MessageList({ messages }) {
+    var tmp = false;
+    messages.forEach(element => {
+        tmp = true;
+        console.log('dupa.8');
+    });
+    if (!tmp) { return ''; }
     return (
         <div class="MessageList">
             <List>
-                {messages.map((message) => (
+                {messages.pop().map((message) => (
                     <Message
                         message={message}
                     />

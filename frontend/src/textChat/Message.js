@@ -6,9 +6,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 
 // single message in text-chat
 function Message({ message}) {
-    console.log(message);
     return (
-        <ListItem style="border: solid;">
+        <ListItem>
             <ListItemText>{message.content}-{message.createdAt}</ListItemText>
         </ListItem>
     );

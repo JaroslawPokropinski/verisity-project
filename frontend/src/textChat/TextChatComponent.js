@@ -10,14 +10,14 @@ class TextChatComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            messages: [],
-            get_friend: props.get_friend
+            get_friend: props.get_friend,
         };
     }
 
     render() {
-        var { messages } = this.state;
-        messages = messages.sort(function(a, b) { return a.createdAt > b.createdAt; });
+        console.log('render');
+        var { get_friend } = this.state;
+        var messages = this.getMessages(get_friend());
         return (
             <div className="TextChatComponent">
             <MessageList
@@ -31,18 +31,12 @@ class TextChatComponent extends React.Component {
         )
     }
 
-    componentDidMount() {
-        const { get_friend } = this.state;
-        this.getMessages(get_friend())
-    }
-
     getMessages(friend) {
+        var messages = [];
         axios
         .get('friends/' + friend)
         .then((response) => {
-            this.setState({
-                messages: response.data
-            });
+            messages.push(response.data.sort(function(a, b) { return a.createdAt > b.createdAt; }));
         })
         .catch((err) => {
             if (err.response) {
@@ -51,18 +45,20 @@ class TextChatComponent extends React.Component {
             toast.error(`Failed to get messages list! ${err}`);
             }
         });
+        return messages;
     }
 
     sendMessage(e) {
         var keyCode = e.keyCode || e.which;
         if (keyCode != '13') { return; }
+
         const { get_friend } = this.state;
         const message = e.target.value;
         e.target.value = "";
         const friend = get_friend();
-        axios
-            .post('/friends/' + friend, {message: message});
-        this.getMessages(friend);
+
+        axios.post('/friends/' + friend, {message: message});
+        this.forceUpdate();
     }
 };
 
