@@ -177,7 +177,7 @@ class Root extends React.Component {
     return (
       <div className={classes.root}>
         <CssBaseline />
-        {<AppBar handleDrawerToggle={this.onMobileOpen} />}
+        <AppBar handleDrawerToggle={this.onMobileOpen} />
         <Drawer handleDrawerToggle={this.onMobileOpen} mobileOpen={mobileOpen}>
           <div>
             <FriendsComponent

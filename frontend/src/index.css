@@ -27,14 +27,25 @@ html {
   height: 50px;
 }
 
+.TextChatComponent {
+  width: 400px;
+}
+
 .MessageList {
   overflow: auto;
   height: 90%;
-  width: 400px;
 }
 
 .MessageList .MuiListItem-root {
   border-radius: 4px;
   margin-top: 5px;
   width: max-content;
+}
+
+.TextChatInput {
+  width: 100%;
+}
+
+.TextChatInput .MuiInput-root {
+  width: inherit;
 }
