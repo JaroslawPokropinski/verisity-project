@@ -1,20 +1,32 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import Tooltip from '@material-ui/core/Tooltip';
 
 
-// single message in text-chat
-function Message({ message}) {
+function ColorFromAuthor( author ) {
+    // TODO : implement some smarter mechanics to determine color of message
+    const colors =  [
+        '#00818a',
+        '#f7be16'
+    ]
+
+    return colors[author.length % colors.length];
+};
+
+
+function Message({ message }) {
+    var color = ColorFromAuthor(message.author);
+    var tooltip = `${message.author}: ${message.createdAt}`;
     return (
-        <ListItem>
-            <ListItemText>{message.content}-{message.createdAt}</ListItemText>
-        </ListItem>
+        <Tooltip title={tooltip}>
+            <ListItem style={{background: color}}>
+                <ListItemText>{message.content}</ListItemText>
+            </ListItem>
+        </Tooltip>
     );
 };
 
-Message.PropTypes = {
-    text: PropTypes.string.isRequired,
-};
 
 export default Message;

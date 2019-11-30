@@ -30,8 +30,11 @@ html {
 .MessageList {
   overflow: auto;
   height: 90%;
+  width: 400px;
 }
 
-.MessageList .ListItem {
-  border: solid;
+.MessageList .MuiListItem-root {
+  border-radius: 4px;
+  margin-top: 5px;
+  width: max-content;
 }

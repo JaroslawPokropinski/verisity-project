@@ -11,13 +11,16 @@ class TextChatComponent extends React.Component {
         super(props);
         this.state = {
             get_friend: props.get_friend,
+            messages: [],
+            previous_friend: ''
         };
     }
 
     render() {
-        console.log('render');
-        var { get_friend } = this.state;
-        var messages = this.getMessages(get_friend());
+        const { messages, get_friend, previous_friend } = this.state;
+
+        if (get_friend() != previous_friend) { this.getMessages(); }
+
         return (
             <div className="TextChatComponent">
             <MessageList
@@ -31,21 +34,21 @@ class TextChatComponent extends React.Component {
         )
     }
 
-    getMessages(friend) {
-        var messages = [];
+    getMessages() {
+        const { get_friend } = this.state;
+        const friend = get_friend()
+
         axios
-        .get('friends/' + friend)
-        .then((response) => {
-            messages.push(response.data.sort(function(a, b) { return a.createdAt > b.createdAt; }));
-        })
-        .catch((err) => {
-            if (err.response) {
-            toast.error(`Failed to get messages list! ${err.response.data}`);
-            } else {
-            toast.error(`Failed to get messages list! ${err}`);
-            }
-        });
-        return messages;
+            .get('friends/' + friend)
+            .then((response) => {
+                this.setState({
+                    messages: response.data.sort(function(a, b) { return a.createdAt > b.createdAt; }),
+                    previous_friend: friend
+                });
+            })
+            .catch((err) => {
+                toast.error(`Failed to get messages list!`);
+            });
     }
 
     sendMessage(e) {
@@ -55,10 +58,15 @@ class TextChatComponent extends React.Component {
         const { get_friend } = this.state;
         const message = e.target.value;
         e.target.value = "";
-        const friend = get_friend();
 
-        axios.post('/friends/' + friend, {message: message});
-        this.forceUpdate();
+        axios
+            .post('/friends/' + get_friend(), {message: message})
+            .then(() => {
+                this.getMessages();
+            })
+            .catch((err) => {
+                toast.error(`Failed to send message.`);
+            });
     }
 };
 

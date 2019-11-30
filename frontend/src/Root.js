@@ -39,7 +39,7 @@ class Root extends React.Component {
     this.mediastream = null;
     this.videoRef = null;
     this.devices = { audio: false, video: false };
-    this.textchat_friend = null;
+    this.selected_friend = '';
     autoBind(this);
   }
 
@@ -158,16 +158,21 @@ class Root extends React.Component {
   }
 
   onFriendClick(email) {
-    this.setState({ textchat_friend: email });
+    this.setState({ selected_friend: email });
   }
 
   getTextchatFriend() {
-    return this.state.textchat_friend;
+    return this.state.selected_friend;
   }
 
   render() {
     const { classes } = this.props;
-    const { call, mobileOpen } = this.state;
+    const { call, mobileOpen, selected_friend } = this.state;
+
+    var textChat = '';
+    if(!selected_friend == '') {
+      textChat = <TextChatComponent get_friend={this.getTextchatFriend} />;
+    }
 
     return (
       <div className={classes.root}>
@@ -184,7 +189,7 @@ class Root extends React.Component {
             />
           </div>
         </Drawer>
-        <TextChatComponent get_friend={this.getTextchatFriend} />
+        {textChat}
         <Content className={classes.content} selected={call} onCall={call} onVideo={this.onVideo} />
         {/* <Chat onVideo={this.onVideo} /> */}
 
