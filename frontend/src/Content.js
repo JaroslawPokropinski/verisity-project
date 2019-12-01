@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import VideoChat from './components/VideoChat';
+import TextChatComponent from './textChat/TextChatComponent';
 
 const ContentContainer = styled.div`
   height: 100%;
@@ -26,7 +27,6 @@ const SubContainer = styled.div`
   text-align: center;
 `;
 
-const Chat = styled.div``;
 
 const NoneSelected = () => (
   <span>
@@ -40,7 +40,7 @@ const ConditionalContent = (props) => {
     return (
       <SubContainer>
         <VideoChat onCall={onCall} onVideo={onVideo} />
-        <Chat />
+        <TextChatComponent get_friend={selected} />
       </SubContainer>
     );
   }
@@ -52,13 +52,13 @@ const ConditionalContent = (props) => {
 };
 
 ConditionalContent.propTypes = {
-  selected: PropTypes.instanceOf(Object),
+  selected: PropTypes.string,
   onCall: PropTypes.instanceOf(Object),
   onVideo: PropTypes.func.isRequired,
 };
 
 ConditionalContent.defaultProps = {
-  selected: null,
+  selected: '',
   onCall: null,
 };
 
@@ -83,13 +83,13 @@ class Content extends React.Component {
 
 Content.propTypes = {
   classes: PropTypes.instanceOf(Object).isRequired,
-  selected: PropTypes.instanceOf(Object),
+  selected: PropTypes.string,
   onCall: PropTypes.instanceOf(Object),
   onVideo: PropTypes.func.isRequired,
 };
 
 Content.defaultProps = {
-  selected: null,
+  selected: '',
   onCall: null,
 };
 
