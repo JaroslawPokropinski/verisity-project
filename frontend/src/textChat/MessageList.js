@@ -7,22 +7,22 @@ import Message from './Message';
 
 
 function MessageList({ messages }) {
-
-    return (
-        <div class="MessageList">
-            <List>
-                {messages.map((message) => (
-                    <Message
-                        message={message}
-                    />
-                ))}
-            </List>
-        </div>
-    );
-};
-
-MessageList.PropTypes = {
-    messages: PropTypes.arrayOf(PropTypes.shape({ content: PropTypes.string })).isRequired,
+  return (
+    <div className="MessageList">
+      <List>
+        {messages.map((message) => (
+          <Message
+            key={message.id}
+            message={message}
+          />
+        ))}
+      </List>
+    </div>
+  );
 }
+
+MessageList.propTypes = {
+  messages: PropTypes.arrayOf(PropTypes.shape({ content: PropTypes.string })).isRequired,
+};
 
 export default MessageList;

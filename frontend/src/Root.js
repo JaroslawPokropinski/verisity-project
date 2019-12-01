@@ -148,7 +148,7 @@ class Root extends React.Component {
 
   acceptFriend(email) {
     axios
-    .post('/friends/invitations', { email })
+      .post('/friends/invitations', { email })
       .then(() => {
         toast.success(`Friend ${email} accepted!`);
       })
@@ -169,11 +169,6 @@ class Root extends React.Component {
     const { classes } = this.props;
     const { call, mobileOpen, selected_friend } = this.state;
 
-    var textChat = '';
-    if(!selected_friend == '') {
-      textChat = <TextChatComponent get_friend={this.getTextchatFriend} />;
-    }
-
     return (
       <div className={classes.root}>
         <CssBaseline />
@@ -189,8 +184,7 @@ class Root extends React.Component {
             />
           </div>
         </Drawer>
-        {textChat}
-        <Content className={classes.content} selected={call} onCall={call} onVideo={this.onVideo} />
+        <Content className={classes.content} selected={selected_friend} onCall={call} onVideo={this.onVideo} />
         {/* <Chat onVideo={this.onVideo} /> */}
 
       </div>
