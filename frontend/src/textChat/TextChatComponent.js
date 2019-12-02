@@ -26,7 +26,19 @@ class TextChatComponent extends React.Component {
       messages: [],
       previous_friend: ''
     };
+    this.interval = null;
     autoBind(this);
+  }
+
+  componentDidMount() {
+    setInterval(this.getMessages, 10000);
+  }
+
+  componentWillUnmount() {
+    if (this.interval !== null) {
+      clearInterval(this.interval);
+      this.interval = null;
+    }
   }
 
   getMessages() {
