@@ -19,12 +19,12 @@ const SubContainer = styled.div`
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-content: center;
-  text-align: center;
+  justify-content: stretch;
+  align-items: center;
   border-radius: 4px;
   /* background-color: var(--primary-color); */
   text-align: center;
+  overflow: hidden;
 `;
 
 
@@ -36,11 +36,14 @@ const NoneSelected = () => (
 
 const ConditionalContent = (props) => {
   const { selected, onCall, onVideo } = props;
-  if (selected) {
+  if (selected || onCall) {
     return (
       <SubContainer>
-        <VideoChat onCall={onCall} onVideo={onVideo} />
-        <TextChatComponent get_friend={selected} />
+        {(onCall) ? <VideoChat onCall={onCall} onVideo={onVideo} /> : null}
+
+        {(selected) ? <TextChatComponent get_friend={selected} /> : null}
+
+
       </SubContainer>
     );
   }

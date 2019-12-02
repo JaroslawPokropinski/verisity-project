@@ -29,11 +29,13 @@ html {
 
 .TextChatComponent {
   width: 400px;
+  height: 100%;
 }
 
 .MessageList {
-  overflow: auto;
+  overflow: hidden;
   height: 90%;
+  overflow-y: auto;
 }
 
 .MessageList .MuiListItem-root {

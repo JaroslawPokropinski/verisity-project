@@ -104,6 +104,7 @@ class Root extends React.Component {
       .catch(() => {
         toast.error('Failed to call user');
       });
+    this.onFriendClick(email);
   }
 
   // on button 'call friend' pressed
