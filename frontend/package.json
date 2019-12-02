@@ -6,6 +6,8 @@
   "scripts": {
     "start": "parcel -p 3000 index.html",
     "build": "parcel build index.html",
+    "workbox": "workbox generateSW workbox-config.js",
+    "postbuild": "npm run workbox",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -18,7 +20,8 @@
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.15.1",
-    "parcel-bundler": "^1.12.4"
+    "parcel-bundler": "^1.12.4",
+    "workbox-cli": "^4.3.1"
   },
   "dependencies": {
     "@material-ui/core": "^4.6.1",
