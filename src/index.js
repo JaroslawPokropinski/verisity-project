@@ -39,7 +39,7 @@ app.use('/api', api(userService));
 app.use(swagger);
 
 // Connect react application
-app.get('/', (_req, res) => {
+app.get(['/', '/index.html'], (_req, res) => {
   res.redirect('/app/');
 });
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
