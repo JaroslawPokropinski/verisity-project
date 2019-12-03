@@ -11,8 +11,10 @@ import AppBar from './components/AppBar';
 import Content from './Content';
 import Media from './helpers/media';
 import FriendsComponent from './friendList/FriendsComponent';
+import InvitationComponent from './invitationList/InvitationComponent';
 import axios from './axios';
 import Drawer from './components/Drawer';
+import AnswerDialog from './components/AnswerDialog';
 
 const styles = (theme) => ({
   root: {
@@ -25,18 +27,32 @@ const styles = (theme) => ({
   },
 });
 
-// ===== mock for FriendList =====
-const onFriendClick = (email) => alert(`Typing to friend ${email}!`);
-// ===== end mock for FriendList =====
-
+function acceptFriend(email) {
+  axios
+    .post('/friends/invitations', { email })
+    .then(() => {
+      toast.success(`Friend ${email} accepted!`);
+    })
+    .catch(() => {
+      toast.error('Failed to accept user');
+    });
+}
 
 class Root extends React.Component {
   constructor() {
     super();
-    this.state = { /* friends: null */ input: '', call: null, mobileOpen: false };
+    this.state = {
+      input: '',
+      call: null,
+      mobileOpen: false,
+      answerDialogOpen: false,
+      answerDialogAgree: () => {},
+      answerDialogDisagree: () => {},
+    };
     this.mediastream = null;
     this.videoRef = null;
     this.devices = { audio: false, video: false };
+    this.selectedFriend = '';
     autoBind(this);
   }
 
@@ -75,7 +91,8 @@ class Root extends React.Component {
         toast.error(`Call error: ${err}`);
       });
 
-      Media.getMedia(this.devices)
+      const agree = () => {
+        Media.getMedia(this.devices)
         .then((stream) => {
           call.answer(stream);
           call.on('stream', (incoming) => {
@@ -90,6 +107,20 @@ class Root extends React.Component {
         .catch((error) => {
           toast.error(`Failed to get video with error: ${error}`);
         });
+        this.setState({ answerDialogOpen: false });
+      };
+
+      const disagree = () => {
+        toast('close');
+        call.close();
+        this.setState({ answerDialogOpen: false });
+      };
+
+      this.setState({
+        answerDialogOpen: true,
+        answerDialogAgree: agree,
+        answerDialogDisagree: disagree
+      });
     });
   }
 
@@ -101,6 +132,7 @@ class Root extends React.Component {
       .catch(() => {
         toast.error('Failed to call user');
       });
+    this.onFriendClick(email);
   }
 
   // on button 'call friend' pressed
@@ -143,23 +175,49 @@ class Root extends React.Component {
     this.setState({ mobileOpen: !mobileOpen });
   }
 
+
+  onFriendClick(email) {
+    this.setState({ selectedFriend: email });
+  }
+
+  getTextchatFriend() {
+    const { selectedFriend } = this.state;
+    return selectedFriend;
+  }
+
   render() {
     const { classes } = this.props;
-    const { call, mobileOpen } = this.state;
+    const {
+      call, mobileOpen, selectedFriend, answerDialogOpen, answerDialogAgree, answerDialogDisagree
+    } = this.state;
 
     return (
       <div className={classes.root}>
         <CssBaseline />
+        <AnswerDialog
+          open={answerDialogOpen}
+          onAgree={answerDialogAgree}
+          onDisagree={answerDialogDisagree}
+        />
         <AppBar handleDrawerToggle={this.onMobileOpen} />
         <Drawer handleDrawerToggle={this.onMobileOpen} mobileOpen={mobileOpen}>
-          <FriendsComponent
-            onFriendClick={onFriendClick}
-            onFriendCall={this.onFriendCall}
-          />
+          <div>
+            <FriendsComponent
+              onFriendClick={this.onFriendClick}
+              onFriendCall={this.onFriendCall}
+            />
+            <InvitationComponent
+              acceptFriend={acceptFriend}
+            />
+          </div>
         </Drawer>
-        <Content className={classes.content} selected={call} onCall={call} onVideo={this.onVideo} />
+        <Content
+          className={classes.content}
+          selected={selectedFriend}
+          onCall={call}
+          onVideo={this.onVideo}
+        />
 
-        {/* <Chat onVideo={this.onVideo} /> */}
       </div>
     );
   }

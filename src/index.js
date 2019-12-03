@@ -31,15 +31,15 @@ app.use(session(sessionConfig));
 database.sync({ force: true })
   .then(() => userService.addUser('admin@example.com', 'admin', 'adminadmin'))
   .then(() => userService.addUser('admin2@example.com', 'admin2', 'adminadmin'))
-  .then(() => userService.inviteFriend('admin', 'admin2'))
-  .then(() => userService.acceptInvitation('admin2', 'admin'))
+  .then(() => userService.inviteFriend('admin@example.com', 'admin2@example.com'))
+  .then(() => userService.acceptInvitation('admin2@example.com', 'admin@example.com'))
 
 // Setup controllers
 app.use('/api', api(userService));
 app.use(swagger);
 
 // Connect react application
-app.get('/', (_req, res) => {
+app.get(['/', '/index.html'], (_req, res) => {
   res.redirect('/app/');
 });
 app.use(express.static(path.join(__dirname, '../frontend/dist')));

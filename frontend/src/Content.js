@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import VideoChat from './components/VideoChat';
+import TextChatComponent from './textChat/TextChatComponent';
 
 const ContentContainer = styled.div`
   height: 100%;
@@ -18,15 +19,14 @@ const SubContainer = styled.div`
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-content: center;
-  text-align: center;
+  justify-content: stretch;
+  align-items: center;
   border-radius: 4px;
   /* background-color: var(--primary-color); */
   text-align: center;
+  overflow: hidden;
 `;
 
-const Chat = styled.div``;
 
 const NoneSelected = () => (
   <span>
@@ -36,11 +36,14 @@ const NoneSelected = () => (
 
 const ConditionalContent = (props) => {
   const { selected, onCall, onVideo } = props;
-  if (selected) {
+  if (selected || onCall) {
     return (
       <SubContainer>
-        <VideoChat onCall={onCall} onVideo={onVideo} />
-        <Chat />
+        {(onCall) ? <VideoChat onCall={onCall} onVideo={onVideo} /> : null}
+
+        {(selected) ? <TextChatComponent get_friend={selected} /> : null}
+
+
       </SubContainer>
     );
   }
@@ -52,13 +55,13 @@ const ConditionalContent = (props) => {
 };
 
 ConditionalContent.propTypes = {
-  selected: PropTypes.instanceOf(Object),
+  selected: PropTypes.string,
   onCall: PropTypes.instanceOf(Object),
   onVideo: PropTypes.func.isRequired,
 };
 
 ConditionalContent.defaultProps = {
-  selected: null,
+  selected: '',
   onCall: null,
 };
 
@@ -83,13 +86,13 @@ class Content extends React.Component {
 
 Content.propTypes = {
   classes: PropTypes.instanceOf(Object).isRequired,
-  selected: PropTypes.instanceOf(Object),
+  selected: PropTypes.string,
   onCall: PropTypes.instanceOf(Object),
   onVideo: PropTypes.func.isRequired,
 };
 
 Content.defaultProps = {
-  selected: null,
+  selected: '',
   onCall: null,
 };
 
