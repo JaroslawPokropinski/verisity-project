@@ -17,4 +17,3 @@ Versity-project is an project written for 'Software Development Methods' on Wroc
 + Mateusz Sopiński
 + Wojciech Zaniewski
 + Piotr Gierczak
-+ ... (Everyone add your name here as first commit)
