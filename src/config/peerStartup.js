@@ -1,4 +1,4 @@
-const ExpressPeerServer = require('peer').ExpressPeerServer;
+const ExpressPeerServer = require('../../lib/peer/src').ExpressPeerServer;
 const http = require('http');
 const https = require('https');
 

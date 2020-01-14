@@ -29,7 +29,6 @@
     "debug": "^4.1.1",
     "express": "^4.17.1",
     "express-session": "^1.16.2",
-    "peer": "git+https://github.com/peers/peerjs-server.git",
     "pg": "^7.12.1",
     "react": "^16.12.0",
     "selenium-webdriver": "^4.0.0-alpha.5",
